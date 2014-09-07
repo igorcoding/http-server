@@ -7,7 +7,6 @@ http_protocol http_protocol::parse(const std::string& str)
 {
     http_protocol p;
 
-    auto pos = str.find(HTTP_BEGIN) + HTTP_BEGIN.length();
     std::string version = str.substr(HTTP_BEGIN.length());
 
     if (version.length() != 3 || version[1] != '.')
@@ -17,4 +16,9 @@ http_protocol http_protocol::parse(const std::string& str)
     p.v_minor = atoi(version.substr(2, 1).c_str());
 
     return p;
+}
+
+std::string http_protocol::to_string() const
+{
+    return HTTP_BEGIN + std::to_string(v_major) + "." + std::to_string(v_minor);
 }

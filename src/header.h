@@ -9,6 +9,7 @@ struct header
     std::string value;
 
     static header parse(const std::string& line);
+    std::string to_string() const;
 
 private:
     static const std::string NAME_VALUE_SEPARATOR;

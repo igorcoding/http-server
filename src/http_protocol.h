@@ -9,6 +9,7 @@ struct http_protocol
     int v_minor;
 
     static http_protocol parse(const std::string& str);
+    std::string to_string() const;
 
 private:
     static const std::string HTTP_BEGIN;
