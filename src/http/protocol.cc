@@ -1,4 +1,4 @@
-#include "http_protocol.h"
+#include "protocol.h"
 #include "exceptions/malformed_components.h"
 
 const std::string http_protocol::HTTP_BEGIN = "HTTP/";

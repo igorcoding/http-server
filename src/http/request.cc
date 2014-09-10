@@ -1,13 +1,14 @@
 #include "request.h"
-#include "util/misc.h"
+#include "../util/misc.h"
 #include "exceptions/malformed_components.h"
 
 request::request()
     : _malformed(false)
 { }
 
-request request::parse(const std::string& raw_request)
+void request::parse(const std::string& raw_request)
 {
+    _raw = raw_request;
     std::vector<std::string> lines;
     misc::split(raw_request, misc::crlf, lines);
 
@@ -16,10 +17,8 @@ request request::parse(const std::string& raw_request)
     misc::split(first_line, " ", first_line_components);
 
 
-    request req;
-
     if (first_line_components.size() != FIRST_LINE_SIZE)
-        return make_malformed(req);
+        make_malformed(*this);
 
     try {
         auto& last_line = *(std::end(lines) - 1);
@@ -27,20 +26,18 @@ request request::parse(const std::string& raw_request)
             throw malformed_request();
         }
 
-        req._method = methods::assist::from_str(first_line_components[0]);
-        req._uri = normalize_uri(first_line_components[1]);
-        req._protocol = http_protocol::parse(first_line_components[2]);
+        _method = methods::assist::from_str(first_line_components[0]);
+        _uri = normalize_uri(first_line_components[1]);
+        _protocol = http_protocol::parse(first_line_components[2]);
 
         for (auto it = std::begin(lines) + 1; it != std::end(lines) - 1; ++it) {
             auto& line = *it;
-            req._headers.push_back(header::parse(line));
+            _headers.push_back(header::parse(line));
         }
 
     } catch (malformed_request& e) {
-        return make_malformed(req);
+        make_malformed(*this);
     }
-
-    return req;
 }
 
 std::string request::normalize_uri(const std::string& uri)

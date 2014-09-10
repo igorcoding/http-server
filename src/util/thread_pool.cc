@@ -15,7 +15,7 @@ void thread_pool::worker()
 {
     while (_running) {
         std::unique_lock<std::mutex> lock(_m);
-        _condition.wait(lock, [this]{ return !(_tasks.empty() && _running); });
+        _condition.wait(lock, [this]{ return !_tasks.empty() && _running; });
 
         if (!_running) {
             // throw ?

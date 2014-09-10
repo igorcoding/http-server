@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <string>
+#include <cstring>
 
 namespace status_codes
 {
@@ -20,13 +21,22 @@ class response
 {
 public:
     response();
+    ~response();
 
     void set_status(status_codes::status_code status_code) {
         _status_code = status_code;
     }
 
-    void append_data(const std::string& piece) {
-        _data.append(piece);
+    void assign_data(const char* data, size_t size) {
+        _data_size = size;
+        delete[] _data;
+        _data = new char[_data_size];
+        memcpy(_data, data, _data_size);
+
+        header h;
+        h.name = "Content-Length";
+        h.value = std::to_string(_data_size);
+        add_header(std::move(h));
     }
 
     template<typename InputIterator> void assign_headers(InputIterator first, InputIterator last);
@@ -41,7 +51,8 @@ private:
     static const http_protocol _protocol;
     status_codes::status_code _status_code;
     std::vector<header> _headers;
-    std::string _data;
+    char* _data;
+    size_t _data_size;
 };
 
 #endif // RESPONSE_H

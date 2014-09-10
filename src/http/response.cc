@@ -1,12 +1,20 @@
 #include "response.h"
-#include "util/misc.h"
+#include "../util/misc.h"
 
 #include <sstream>
 
 const http_protocol response::_protocol = { 1, 0 };
 
 response::response()
+    : _data(nullptr),
+      _data_size(0)
 {
+}
+
+response::~response()
+{
+    delete[] _data;
+    _data_size = 0;
 }
 
 template <typename InputIterator>
@@ -26,10 +34,14 @@ std::string response::build()
     ss << _protocol.to_string() << " "
        << static_cast<int>(_status_code) << " "
        << code_to_str(_status_code) << misc::crlf;
-    for (auto& h : _headers) {
-        ss << h.to_string() << misc::crlf;
-    }
+//    for (auto& h : _headers) {
+//        ss << h.to_string() << misc::crlf;
+//    }
+
+
     ss << misc::crlf;
+
+    ss << _data;
 
     return ss.str();
 }

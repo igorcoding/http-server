@@ -1,7 +1,7 @@
 #ifndef METHODS_H
 #define METHODS_H
 
-#include "util/mapper.h"
+#include "../util/mapper.h"
 #include "exceptions/malformed_components.h"
 
 #include <map>

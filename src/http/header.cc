@@ -1,6 +1,6 @@
 #include "header.h"
 #include "exceptions/malformed_components.h"
-#include "util/misc.h"
+#include "../util/misc.h"
 
 #include <boost/algorithm/string.hpp>
 
@@ -11,8 +11,8 @@ header header::parse(const std::string& line)
     std::vector<std::string> pair;
     misc::split(line, NAME_VALUE_SEPARATOR, pair);
 
-    if (pair.size() != 2)
-        throw malformed_header();
+//    if (pair.size() != 2)
+//        throw malformed_header();
 
     auto name = pair[0];
     auto value = pair[1];
