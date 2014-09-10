@@ -1,5 +1,7 @@
-# Qt
+# IDE settings
 *.user
+build/
+.idea/
 
 # Compiled Object files
 *.slo
