@@ -25,8 +25,9 @@ http_server::~http_server()
 void http_server::run()
 {
     std::cout << "Starting server..." << std::endl;
-
-
+    auto conf = server_config::instance();
+    _listener = new listener(conf.get_ip(), conf.get_port());
+    _listener->run();
     std::cout << "Server stopped" << std::endl;
 }
 
