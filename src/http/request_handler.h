@@ -11,6 +11,13 @@ public:
     static request_handler& instance();
     void handle(request* req, response* resp);
 
+private:
+    void handle_internal(request* req, response* resp);
+    std::string get_current_time();
+    bool filter_request(request* req);
+    bool url_decode(const std::string& in, std::string& out);
+
+    void make_bad_request(response* resp);
 
 private:
     request_handler();

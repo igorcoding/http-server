@@ -16,12 +16,11 @@ std::map<std::string, mime_types::mime_type> file::_mimes
                                                                 (".png", mime_types::image_png)
                                                                 (".swf", mime_types::application_x_shockwave_flash);
 
-void file::load(const char* data, size_t size, mime_types::mime_type type)
+void file::load(char* data, size_t size, mime_types::mime_type type)
 {
     _size = size;
     _type = type;
-    _data = new char[_size];
-    memcpy(_data, data, _size);
+    _data = data;
 }
 
 file::file()

@@ -8,10 +8,14 @@ server_config::server_config()
     load_config();
 }
 
-server_config::server_config(const std::string& ip, int port, const std::string& doc_root)
+server_config::server_config(const std::string& ip,
+                             int port,
+                             const std::string& doc_root,
+                             const std::string& index_filename)
     : _ip(ip),
       _port(port),
-      _doc_root(doc_root)
+      _doc_root(doc_root),
+      _index_filename(index_filename)
 { }
 
 void server_config::set_config_path(const std::string& path)
@@ -40,6 +44,11 @@ const std::string& server_config::get_document_root() const
     return _doc_root;
 }
 
+const std::string&server_config::get_index_filename() const
+{
+    return _index_filename;
+}
+
 void server_config::load_config()
 {
     boost::property_tree::ptree tree;
@@ -47,10 +56,11 @@ void server_config::load_config()
     _ip = tree.get("ip", default_config()._ip);
     _port = tree.get("port", default_config()._port);
     _doc_root = tree.get("document_root", default_config()._doc_root);
+    _index_filename = tree.get("index_filename", default_config()._index_filename);
 }
 
 
 server_config& server_config::default_config() {
-    static server_config default_conf("127.0.0.1", 80, ".");
+    static server_config default_conf("127.0.0.1", 80, "./", "index.html");
     return default_conf;
 }

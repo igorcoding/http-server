@@ -25,12 +25,7 @@ http_server::~http_server()
 void http_server::run()
 {
     std::cout << "Starting server..." << std::endl;
-    ev::default_loop loop;
 
-    _listener = new listener(loop, _port, 1);
-    _listener->run();
-
-    loop.run(0);
 
     std::cout << "Server stopped" << std::endl;
 }

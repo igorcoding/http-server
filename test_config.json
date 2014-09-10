@@ -1,5 +1,6 @@
 {
     "ip": "127.0.0.1",
-    "port": 5555,
-    "document_root": "/home/igor/Documents/www"
+    "port": 8080,
+    "document_root": "/home/igor/Documents/www",
+    "index_filename": "index.html"
 }

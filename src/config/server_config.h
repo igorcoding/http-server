@@ -1,5 +1,5 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef SERVER_CONFIG_H
+#define SERVER_CONFIG_H
 
 #include <string>
 
@@ -12,10 +12,11 @@ public:
     const std::string& get_ip() const;
     int get_port() const;
     const std::string& get_document_root() const;
+    const std::string& get_index_filename() const;
 
 private:
     server_config();
-    server_config(const std::string& ip, int port, const std::string& doc_root);
+    server_config(const std::string& ip, int port, const std::string& doc_root, const std::string& index_filename);
     static server_config& default_config();
     void load_config();
 
@@ -25,6 +26,7 @@ private:
     std::string _ip;
     int _port;
     std::string _doc_root;
+    std::string _index_filename;
 };
 
-#endif // CONFIG_H
+#endif // SERVER_CONFIG_H

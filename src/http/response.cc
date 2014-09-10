@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-const protocol response::_protocol = { 1, 0 };
+const protocol response::_protocol = { 1, 1 };
 
 response::response()
     : _data(nullptr),
@@ -16,6 +16,22 @@ response::~response()
 {
     delete[] _data;
     _data_size = 0;
+}
+
+void response::assign_data(const std::string& str)
+{
+    assign_data(str.c_str(), str.length());
+}
+
+void response::assign_data(const char* data, size_t size) {
+    _data_size = size;
+    delete[] _data;
+    if (data != nullptr) {
+        _data = new char[_data_size];
+        memcpy(_data, data, _data_size);
+    }
+
+    add_header(std::move(common_headers::content_length(size)));
 }
 
 template <typename InputIterator>
@@ -42,7 +58,9 @@ std::string response::build()
 
     ss << misc::crlf;
 
-    ss << _data;
+    if (_data != nullptr) {
+        ss << _data;
+    }
 
     return ss.str();
 }
@@ -53,10 +71,14 @@ std::string response::code_to_str(status_codes::status_code code)
     switch (code) {
     case OK:
         return "OK";
+    case BAD_REQUEST:
+        return "Bad Request";
     case FORBIDDEN:
         return "Access Denied";
     case NOT_FOUND:
         return "Not Found";
+    case METHOD_NOT_ALLOWED:
+        return "Method Not Allowed";
     default:
         break;
     }

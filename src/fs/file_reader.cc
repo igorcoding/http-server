@@ -10,7 +10,7 @@ file_reader::file_reader(const std::string& doc_root)
 {
 }
 
-void file_reader::read(const char* src, file* out)
+void file_reader::read(const char* src, file* out, bool do_reading)
 {
     using namespace boost::filesystem;
 
@@ -37,13 +37,17 @@ void file_reader::read(const char* src, file* out)
     fs.open(src_path.generic_string(), std::ios::in | std::ios::binary | std::ios::ate);
     if (fs.is_open()) {
         int size = fs.tellg();
-        char* data = new char[size];
         fs.seekg(0, std::ios::beg);
-        fs.read(data, size);
+
+        char* data = nullptr;
+        if (do_reading) {
+            data = new char[size];
+            fs.read(data, size);
+        }
+
         fs.close();
 
         out->load(data, size, file::guess_mime(src_path.extension().generic_string()));
-        delete[] data;
     } else {
         throw file_error("File not found");
     }

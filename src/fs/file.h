@@ -26,7 +26,7 @@ class file
 public:
     file();
     ~file();
-    void load(const char* data, size_t size, mime_types::mime_type type);
+    void load(char* data, size_t size, mime_types::mime_type type);
 
     const char* get_data();
     size_t get_size();

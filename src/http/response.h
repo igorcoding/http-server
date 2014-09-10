@@ -12,9 +12,10 @@ namespace status_codes
     enum status_code
     {
         OK = 200,
+        BAD_REQUEST = 400,
         FORBIDDEN = 403,
-        NOT_FOUND = 404
-
+        NOT_FOUND = 404,
+        METHOD_NOT_ALLOWED = 405
 
     };
 
@@ -30,14 +31,8 @@ public:
         _status_code = status_code;
     }
 
-    void assign_data(const char* data, size_t size) {
-        _data_size = size;
-        delete[] _data;
-        _data = new char[_data_size];
-        memcpy(_data, data, _data_size);
-
-        add_header(std::move(common_headers::content_length(size)));
-    }
+    void assign_data(const std::string& str);
+    void assign_data(const char* data, size_t size);
 
     template<typename InputIterator> void assign_headers(InputIterator first, InputIterator last);
     void add_header(const header& h);

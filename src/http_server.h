@@ -3,6 +3,8 @@
 
 #include "listener.h"
 
+#include <string>
+
 class http_server
 {
 public:
