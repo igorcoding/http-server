@@ -9,6 +9,7 @@ response::response()
     : _data(nullptr),
       _data_size(0)
 {
+
 }
 
 response::~response()

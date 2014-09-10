@@ -21,7 +21,6 @@ private:
 
 private:
     static std::string _config_path;
-    static server_config _default_config;
 
     std::string _ip;
     int _port;

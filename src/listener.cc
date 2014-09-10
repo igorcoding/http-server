@@ -68,7 +68,7 @@ void listener::init_socket()
 
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(_port);
+    addr.sin_port = htons(static_cast<uint16_t >(_port));
     addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
 
@@ -144,7 +144,7 @@ void listener::sock_cb(ev::io& w, int revents)
     }
 
     if(read == 0) {
-        // Stop and free watchet if client socket is closing
+        // Stop and free watcher if client socket is closing
         w.stop();
         _socks.erase(w.fd);
         perror("peer might closing");
@@ -153,7 +153,7 @@ void listener::sock_cb(ev::io& w, int revents)
         int cmp = memcmp(buffer + read - 4, "\r\n\r\n", 4);
         if (cmp == 0) {
             sck_t* sock = _socks[w.fd];
-            sock->req()->parse(std::string(buffer, read));
+            sock->req()->parse(std::string(buffer, static_cast<size_t>(read)));
             sock->resp()->set_status(status_codes::OK);
             auto data = sock->req()->get_raw();
             sock->resp()->assign_data(data.c_str(), data.length());

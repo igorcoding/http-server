@@ -2,7 +2,6 @@
 #include "config_read_error.h"
 
 #include <boost/property_tree/json_parser.hpp>
-#include <fstream>
 
 void config_reader::read(const std::string& src, boost::property_tree::ptree* out_tree)
 {
