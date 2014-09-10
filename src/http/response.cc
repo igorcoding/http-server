@@ -18,6 +18,12 @@ response::~response()
     _data_size = 0;
 }
 
+void response::assign_data(const file* f)
+{
+    assign_data(f->get_data(), f->get_size());
+    add_header(common_headers::content_type(f->get_mime()));
+}
+
 void response::assign_data(const std::string& str)
 {
     assign_data(str.c_str(), str.length());

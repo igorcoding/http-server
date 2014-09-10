@@ -26,16 +26,17 @@ class file
 public:
     file();
     ~file();
-    void load(char* data, size_t size, mime_types::mime_type type);
+    void load(const char* data, size_t size, mime_types::mime_type type);
+    void load(const std::string& s);
 
-    const char* get_data();
-    size_t get_size();
-    mime_types::mime_type get_mime();
+    const char* get_data() const;
+    size_t get_size() const;
+    mime_types::mime_type get_mime() const;
 
     static mime_types::mime_type guess_mime(const std::string& extension);
 
 private:
-    char* _data;
+    const char* _data;
     size_t _size;
     mime_types::mime_type _type;
 

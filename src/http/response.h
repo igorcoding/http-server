@@ -1,7 +1,9 @@
 #ifndef RESPONSE_H
 #define RESPONSE_H
 
-#include "request.h"
+#include "header.h"
+#include "protocol.h"
+#include "../fs/file.h"
 
 #include <vector>
 #include <string>
@@ -31,6 +33,7 @@ public:
         _status_code = status_code;
     }
 
+    void assign_data(const file* f);
     void assign_data(const std::string& str);
     void assign_data(const char* data, size_t size);
 

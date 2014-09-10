@@ -22,15 +22,16 @@ void request_handler::handle(request* req, response* resp)
 
 void request_handler::handle_internal(request* req, response* resp)
 {
+    file f;
     if (req->is_malformed()) {
         make_bad_request(resp);
         return;
     }
 
     if (!filter_request(req)) {
-        resp->assign_data("Method not allowed");
+        f.load("Method not allowed");
         resp->set_status(status_codes::METHOD_NOT_ALLOWED);
-        resp->add_header(common_headers::content_type(mime_types::text_plain));
+        resp->assign_data(&f);
         return;
     }
 
@@ -44,20 +45,19 @@ void request_handler::handle_internal(request* req, response* resp)
         uri = "/" + server_config::instance().get_index_filename();
     }
     auto m = req->get_method();
-    file f;
+
     try {
         _freader.read(uri.c_str(), &f, m != methods::HEAD);
-        resp->assign_data(f.get_data(), f.get_size());
-        resp->add_header(common_headers::content_type(f.get_mime()));
+        resp->assign_data(&f);
         resp->set_status(status_codes::OK);
     } catch (file_not_in_doc_root_error& e) {
         resp->set_status(status_codes::FORBIDDEN);
-        resp->assign_data("File \"" + uri + "\" is forbidden");
-        resp->add_header(common_headers::content_type(mime_types::text_plain));
+        f.load("File \"" + uri + "\" is forbidden");
+        resp->assign_data(&f);
     } catch (file_error& e) {
         resp->set_status(status_codes::NOT_FOUND);
-        resp->assign_data("File \"" + uri + "\" not found");
-        resp->add_header(common_headers::content_type(mime_types::text_plain));
+        f.load("File \"" + uri + "\" not found");
+        resp->assign_data(&f);
     }
 }
 

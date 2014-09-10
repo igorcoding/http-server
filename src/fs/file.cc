@@ -16,11 +16,17 @@ std::map<std::string, mime_types::mime_type> file::_mimes
                                                                 (".png", mime_types::image_png)
                                                                 (".swf", mime_types::application_x_shockwave_flash);
 
-void file::load(char* data, size_t size, mime_types::mime_type type)
+void file::load(const char* data, size_t size, mime_types::mime_type type)
 {
+    delete[] _data;
     _size = size;
     _type = type;
     _data = data;
+}
+
+void file::load(const std::string& s)
+{
+    load(s.c_str(), s.length(), mime_types::text_plain);
 }
 
 file::file()
@@ -36,17 +42,17 @@ file::~file()
     _type = mime_types::text_plain;
 }
 
-const char* file::get_data()
+const char* file::get_data() const
 {
     return _data;
 }
 
-size_t file::get_size()
+size_t file::get_size() const
 {
     return _size;
 }
 
-mime_types::mime_type file::get_mime()
+mime_types::mime_type file::get_mime() const
 {
     return _type;
 }
