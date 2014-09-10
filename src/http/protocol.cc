@@ -1,11 +1,11 @@
 #include "protocol.h"
 #include "exceptions/malformed_components.h"
 
-const std::string http_protocol::HTTP_BEGIN = "HTTP/";
+const std::string protocol::HTTP_BEGIN = "HTTP/";
 
-http_protocol http_protocol::parse(const std::string& str)
+protocol protocol::parse(const std::string& str)
 {
-    http_protocol p;
+    protocol p;
 
     std::string version = str.substr(HTTP_BEGIN.length());
 
@@ -18,7 +18,7 @@ http_protocol http_protocol::parse(const std::string& str)
     return p;
 }
 
-std::string http_protocol::to_string() const
+std::string protocol::to_string() const
 {
     return HTTP_BEGIN + std::to_string(v_major) + "." + std::to_string(v_minor);
 }

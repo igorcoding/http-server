@@ -10,7 +10,8 @@ void request::parse(const std::string& raw_request)
 {
     _raw = raw_request;
     std::vector<std::string> lines;
-    misc::split(raw_request, misc::crlf, lines);
+    std::string splitter(misc::crlf);
+    misc::split(raw_request, splitter, lines);
 
     auto& first_line = lines[0];
     std::vector<std::string> first_line_components;
@@ -28,7 +29,7 @@ void request::parse(const std::string& raw_request)
 
         _method = methods::assist::from_str(first_line_components[0]);
         _uri = normalize_uri(first_line_components[1]);
-        _protocol = http_protocol::parse(first_line_components[2]);
+        _protocol = protocol::parse(first_line_components[2]);
 
         for (auto it = std::begin(lines) + 1; it != std::end(lines) - 1; ++it) {
             auto& line = *it;
@@ -38,6 +39,26 @@ void request::parse(const std::string& raw_request)
     } catch (malformed_request& e) {
         make_malformed(*this);
     }
+}
+
+methods::method request::get_method() const
+{
+    return _method;
+}
+
+const std::string& request::get_uri() const
+{
+    return _uri;
+}
+
+const protocol& request::get_protocol() const
+{
+    return _protocol;
+}
+
+const std::vector<header>& request::get_headers() const
+{
+    return _headers;
 }
 
 std::string request::normalize_uri(const std::string& uri)
@@ -57,3 +78,10 @@ request& request::make_malformed(request& req)
     return req;
 }
 
+bool request::is_malformed() const {
+    return _malformed;
+}
+
+const std::string& request::get_raw() const {
+    return _raw;
+}

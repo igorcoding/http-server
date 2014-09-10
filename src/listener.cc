@@ -1,4 +1,5 @@
 #include "listener.h"
+#include "http/request_handler.h"
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -49,10 +50,10 @@ void listener::stop()
     _io->stop();
     delete _io;
 
-    for (size_t i = 0; i < _workers_count; ++i) {
-        delete _cvs[i];
-        delete _workers[i];
-    }
+//    for (size_t i = 0; i < _workers_count; ++i) {
+//        delete _cvs[i];
+//        delete _workers[i];
+//    }
 }
 
 void listener::init_socket()
@@ -154,12 +155,16 @@ void listener::sock_cb(ev::io& w, int revents)
         if (cmp == 0) {
             sck_t* sock = _socks[w.fd];
             sock->req()->parse(std::string(buffer, static_cast<size_t>(read)));
-            sock->resp()->set_status(status_codes::OK);
-            auto data = sock->req()->get_raw();
-            sock->resp()->assign_data(data.c_str(), data.length());
+
+            request_handler::instance().handle(sock->req(), sock->resp());
 
             auto resp = sock->resp()->build();
-            send(w.fd, resp.c_str(), resp.length(), 0);
+            int total_sent = 0;
+            // SUCH BAD, MUCH NAIVE, WOW
+            while (total_sent != sock->resp()->get_data_size()) {
+                int sent = send(w.fd, resp.c_str(), resp.length(), 0);
+                total_sent += sent;
+            }
         }
     }
 }

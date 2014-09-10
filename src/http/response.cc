@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-const http_protocol response::_protocol = { 1, 0 };
+const protocol response::_protocol = { 1, 0 };
 
 response::response()
     : _data(nullptr),
@@ -35,9 +35,9 @@ std::string response::build()
     ss << _protocol.to_string() << " "
        << static_cast<int>(_status_code) << " "
        << code_to_str(_status_code) << misc::crlf;
-//    for (auto& h : _headers) {
-//        ss << h.to_string() << misc::crlf;
-//    }
+    for (auto& h : _headers) {
+        ss << h.to_string() << misc::crlf;
+    }
 
 
     ss << misc::crlf;
@@ -49,9 +49,14 @@ std::string response::build()
 
 std::string response::code_to_str(status_codes::status_code code)
 {
+    using namespace status_codes;
     switch (code) {
-    case status_codes::OK:
+    case OK:
         return "OK";
+    case FORBIDDEN:
+        return "Access Denied";
+    case NOT_FOUND:
+        return "Not Found";
     default:
         break;
     }

@@ -1,5 +1,6 @@
 #include "file_reader.h"
 #include "file_error.h"
+#include "file_not_in_doc_root_error.h"
 
 #include <fstream>
 #include <iostream>
@@ -16,31 +17,37 @@ void file_reader::read(const char* src, file* out)
     if (out == nullptr)
         return;
 
-    path src_path(src);
-    src_path = canonical(absolute(src_path));
-
     path doc_root_path(_doc_root);
     doc_root_path = canonical(absolute(doc_root_path));
 
-    if (path_contains_file(doc_root_path, src_path)) {
-        std::fstream fs;
-        fs.open(src_path.generic_string(), std::ios::in | std::ios::binary | std::ios::ate);
-        if (fs.is_open()) {
-            int size = fs.tellg();
-            char* data = new char[size];
-            fs.seekg(0, std::ios::beg);
-            fs.read(data, size);
-            fs.close();
 
-            out->load(data, size, file::guess_mime(src_path.extension().generic_string()));
-            delete[] data;
-        } else {
-            throw file_error();
-        }
-        fs.close();
+    path src_path(src);
+    try {
+        src_path = canonical(absolute(doc_root_path / src_path));
+    } catch (std::exception& e) {
+        throw file_error("File not found");
     }
 
-    throw file_error();
+
+    if (!path_contains_file(doc_root_path, src_path)) {
+        throw file_not_in_doc_root_error();
+    }
+
+    std::fstream fs;
+    fs.open(src_path.generic_string(), std::ios::in | std::ios::binary | std::ios::ate);
+    if (fs.is_open()) {
+        int size = fs.tellg();
+        char* data = new char[size];
+        fs.seekg(0, std::ios::beg);
+        fs.read(data, size);
+        fs.close();
+
+        out->load(data, size, file::guess_mime(src_path.extension().generic_string()));
+        delete[] data;
+    } else {
+        throw file_error("File not found");
+    }
+    fs.close();
 }
 
 bool file_reader::path_contains_file(boost::filesystem::path dir, boost::filesystem::path file)

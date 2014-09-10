@@ -6,7 +6,7 @@
 class file_error : public std::runtime_error
 {
 public:
-    file_error();
+    file_error(const std::string& msg);
 };
 
 #endif // FILE_ERROR_H

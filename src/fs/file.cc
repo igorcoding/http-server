@@ -13,7 +13,8 @@ std::map<std::string, mime_types::mime_type> file::_mimes
                                                                 (".jpg", mime_types::image_jpeg)
                                                                 (".jpeg", mime_types::image_jpeg)
                                                                 (".gif", mime_types::image_gif)
-                                                                (".png", mime_types::image_png);
+                                                                (".png", mime_types::image_png)
+                                                                (".swf", mime_types::application_x_shockwave_flash);
 
 void file::load(const char* data, size_t size, mime_types::mime_type type)
 {

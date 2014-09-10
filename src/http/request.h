@@ -15,13 +15,12 @@ public:
     request();
     void parse(const std::string& raw_request);
 
-    bool is_malformed() {
-        return _malformed;
-    }
-
-    std::string&  get_raw() {
-        return _raw;
-    }
+    methods::method get_method() const;
+    const std::string& get_uri() const;
+    const protocol& get_protocol() const;
+    const std::vector<header>& get_headers() const;
+    bool is_malformed() const;
+    const std::string& get_raw() const;
 
 private:
     static request& make_malformed(request& req);
@@ -30,7 +29,7 @@ private:
 private:
     methods::method _method;
     std::string _uri;
-    http_protocol _protocol;
+    protocol _protocol;
     std::vector<header> _headers;
     bool _malformed;
 

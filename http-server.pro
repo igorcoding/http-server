@@ -26,7 +26,8 @@ SOURCES += \
     src/http/protocol.cc \
     src/config/config_read_error.cc \
     src/http/request_handler.cc \
-    src/sck_t.cc
+    src/sck_t.cc \
+    src/fs/file_not_in_doc_root_error.cc
 
 HEADERS += \
     src/http_server.h \
@@ -51,7 +52,8 @@ HEADERS += \
     src/http/exceptions/malformed_components.h \
     src/http/protocol.h \
     src/config/config_read_error.h \
-    src/http/request_handler.h
+    src/http/request_handler.h \
+    src/fs/file_not_in_doc_root_error.h
 
 
 unix {

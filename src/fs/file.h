@@ -16,7 +16,8 @@ namespace mime_types {
         application_json,
         image_gif,
         image_jpeg,
-        image_png
+        image_png,
+        application_x_shockwave_flash
     };
 }
 
