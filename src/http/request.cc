@@ -21,8 +21,6 @@ void request::parse(const std::string& raw_request)
     misc::split(first_line, " ", first_line_components);
 
 
-    if (first_line_components.size() != FIRST_LINE_SIZE)
-        make_malformed(*this);
 
     try {
         auto& last_line = *(std::end(lines) - 1);
@@ -31,10 +29,10 @@ void request::parse(const std::string& raw_request)
         }
 
         _method = methods::assist::from_str(first_line_components[0]);
-        _uri = normalize_uri(first_line_components[1]);
-        _protocol = protocol::parse(first_line_components[2]);
+        normalize_uri(merge_middle(first_line_components));
+        _protocol = protocol::parse(first_line_components.back());
 
-        for (auto it = std::begin(lines) + 1; it != std::end(lines) - 1; ++it) {
+        for (auto it = lines.begin() + 1; it != lines.end() - 1; ++it) {
             auto& line = *it;
             _headers.push_back(header::parse(line));
         }
@@ -46,12 +44,13 @@ void request::parse(const std::string& raw_request)
 
 bool request::add_chunk(const char* data, size_t size)
 {
-    _chunks.push_back(std::make_shared<chunk>(data, size));
+    _chunks.push_back(boost::make_shared<chunk>(data, size));
     auto last = _chunks.back()->data();
     // TODO
-    if (memcmp(last + size - 4, misc::double_crlf, 4) == 0) {
-        auto merged = merge_chunks();
-        parse(merged);
+    auto finished = strstr(last, misc::double_crlf);
+    if (finished != nullptr) {
+        auto merged = chunk::merge_chunks(_chunks);
+        parse(std::string(merged->data(), merged->size()));
         return true;
     }
     return false;
@@ -67,6 +66,11 @@ const std::string& request::get_uri() const
     return _uri;
 }
 
+const std::string&request::get_query() const
+{
+    return _query;
+}
+
 const protocol& request::get_protocol() const
 {
     return _protocol;
@@ -77,34 +81,29 @@ const std::vector<header>& request::get_headers() const
     return _headers;
 }
 
-std::string request::normalize_uri(const std::string& uri)
+void request::normalize_uri(const std::string& uri)
 {
-    std::string normalized = uri;
-    // TODO
-
-    if (normalized == "") {
+    if (uri == "") {
         throw malformed_uri();
     }
-    return normalized;
+
+    size_t query_pos = uri.find('?');
+    if (query_pos != std::string::npos) {
+        _uri = uri.substr(0, query_pos);
+        _query = uri.substr(query_pos);
+    } else {
+        _uri = uri;
+    }
 }
 
-std::string request::merge_chunks() const
+std::string request::merge_middle(const std::vector<std::string>& components)
 {
-    size_t total_size = 0;
-    for (auto& c : _chunks) {
-        total_size += c->size();
+    std::string s;
+    size_t size = components.size() - 1;
+    for (size_t i = 1; i < size - 1; ++i) {
+        s += components[i] + " ";
     }
-
-    char* merged = new char[total_size];
-    size_t offset = 0;
-    for (auto c : _chunks) {
-        memcpy(merged + offset, c->data(), c->size());
-        offset += c->size();
-    }
-
-    auto s = std::string(merged, total_size);
-    delete[] merged;
-    merged = nullptr;
+    s += components[size - 1];
     return s;
 }
 

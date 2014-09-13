@@ -25,9 +25,10 @@ SOURCES += \
     src/http/protocol.cc \
     src/config/config_read_error.cc \
     src/http/request_handler.cc \
-    src/fs/file_not_in_doc_root_error.cc \
     src/connection.cc \
-    src/io_service_manager.cc
+    src/io_service_manager.cc \
+    src/fs/file_access_denied.cc \
+    src/http/chunk.cc
 
 HEADERS += \
     src/http_server.h \
@@ -51,14 +52,17 @@ HEADERS += \
     src/http/protocol.h \
     src/config/config_read_error.h \
     src/http/request_handler.h \
-    src/fs/file_not_in_doc_root_error.h \
     src/worker.h \
     src/connection.h \
-    src/io_service_manager.h
+    src/io_service_manager.h \
+    src/fs/file_access_denied.h \
+    src/http/chunk.h
 
 
 unix {
-    LIBS += -lev -lboost_system -lboost_filesystem
+    LIBS += -lboost_system \
+            -lboost_filesystem \
+            -lboost_thread
 }
 
 OTHER_FILES += \

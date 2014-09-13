@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <string>
 #include <map>
+#include <boost/shared_ptr.hpp>
 
 namespace mime_types {
     enum mime_type
@@ -32,16 +33,18 @@ public:
     const char* get_data() const;
     size_t get_size() const;
     mime_types::mime_type get_mime() const;
+    bool is_empty() const;
 
     static mime_types::mime_type guess_mime(const std::string& extension);
 
 private:
-    const char* _data;
+    char* _data;
     size_t _size;
     mime_types::mime_type _type;
-    bool _do_delete;
 
     static std::map<std::string, mime_types::mime_type> _mimes;
 };
+
+typedef boost::shared_ptr<file> file_ptr;
 
 #endif // FILE_H

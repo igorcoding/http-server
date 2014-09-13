@@ -5,14 +5,12 @@
 
 struct protocol
 {
-    int v_major;
-    int v_minor;
+    static const std::string HTTP_BEGIN;
+    std::string v_major;
+    std::string v_minor;
 
     static protocol parse(const std::string& str);
     std::string to_string() const;
-
-private:
-    static const std::string HTTP_BEGIN;
 };
 
 #endif // PROTOCOL_H

@@ -1,6 +1,7 @@
 #include "file_reader.h"
 #include "file_error.h"
-#include "file_not_in_doc_root_error.h"
+#include "file_access_denied.h"
+#include "../http/chunk.h"
 
 #include <fstream>
 #include <iostream>
@@ -11,7 +12,7 @@ file_reader::file_reader(const std::string& doc_root, const std::string& index_f
 {
 }
 
-void file_reader::read(const char* src, file* out, bool do_reading)
+void file_reader::read(const std::string& src, file_ptr out, bool do_reading)
 {
     using namespace boost::filesystem;
 
@@ -29,40 +30,46 @@ void file_reader::read(const char* src, file* out, bool do_reading)
         throw file_error("File not found");
     }
 
-
-    if (!path_contains_file(doc_root_path, src_path)) {
-        throw file_not_in_doc_root_error();
-    }
-
     try {
         if (is_directory(src_path)) {
-            src_path.clear();
-            src_path = path("/" + _index_filename);
-            src_path = canonical(absolute(doc_root_path / src_path));
+            src_path /= path(_index_filename);
+            src_path = canonical(absolute(src_path));
         }
     } catch (std::exception& e) {
-        throw file_error("File not found");
+        throw file_access_denied();
     }
+
+//    if (!path_contains_file(doc_root_path, src_path)) {
+//        throw file_error("Not found");
+//    }
 
     std::fstream fs;
-    fs.open(src_path.generic_string(), std::ios::in | std::ios::binary | std::ios::ate);
-    if (fs.is_open()) {
-        int size = fs.tellg();
-        fs.seekg(0, std::ios::beg);
+    if (!do_reading) {
+        fs.open(src_path.generic_string(), std::ios::in | std::ios::binary | std::ios::ate);
+        if (fs.is_open()) {
+            int size = fs.tellg();
+            fs.close();
 
-        char* data = nullptr;
-        if (do_reading) {
-            data = new char[size];
-            fs.read(data, size);
+            out->load(nullptr, size, file::guess_mime(src_path.extension().generic_string()));
+        } else {
+            throw file_error("File not found");
         }
-
-        fs.close();
-
-        out->load(data, size, file::guess_mime(src_path.extension().generic_string()));
     } else {
-        throw file_error("File not found");
+        fs.open(src_path.generic_string(), std::ios::in | std::ios::binary);
+        if (fs.is_open()) {
+            std::vector<chunk::ptr> chunks;
+            char buf[512];
+            while (fs.read(buf, sizeof(buf)).gcount() > 0)
+                chunks.push_back(boost::make_shared<chunk>(buf, fs.gcount()));
+            auto merged = chunk::merge_chunks(chunks);
+
+            fs.close();
+
+            out->load(merged->data(), merged->size(), file::guess_mime(src_path.extension().generic_string()));
+        } else {
+            throw file_error("File not found");
+        }
     }
-    fs.close();
 }
 
 bool file_reader::path_contains_file(boost::filesystem::path dir, boost::filesystem::path file)

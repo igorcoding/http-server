@@ -3,11 +3,13 @@
 #include "http/request_handler.h"
 
 #include <boost/bind.hpp>
+#include <cstdlib>
 
-connection::connection(boost::asio::io_service& io_service)
+connection::connection(boost::asio::io_service& io_service, request_handler& req_handler)
     : _socket(io_service),
       _req(new request),
-      _resp(new response)
+      _resp(new response),
+      _request_handler(req_handler)
 {
 }
 
@@ -41,33 +43,51 @@ void connection::read_handle(boost::system::error_code e, size_t bytes)
     }
     bool ready = _req->add_chunk(_buf.data(), bytes);
     if (ready) {
-        request_handler::instance().handle(_req, _resp);
-        boost::asio::async_write(_socket, to_asio_buffers(_resp), boost::bind(&connection::write_handle, shared_from_this(),
-                                                         boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred()));
+        _request_handler.handle(_req, _resp);
+        boost::asio::async_write(_socket, to_asio_buffers(*_resp),
+                                 boost::bind(&connection::write_handle, shared_from_this(),
+                                             boost::asio::placeholders::error));
     } else {
         exec_read();
     }
 }
 
-void connection::write_handle(boost::system::error_code e, size_t bytes)
+void connection::write_handle(boost::system::error_code e)
 {
-    if (e)
-        return;
-    boost::system::error_code ec;
-    _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    if (!e) {
+        boost::system::error_code ec;
+        _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    }
 }
 
-std::vector<boost::asio::const_buffer> connection::to_asio_buffers(const response* resp)
+std::vector<boost::asio::const_buffer> connection::to_asio_buffers(response& resp)
 {
     std::vector<boost::asio::const_buffer> bufs;
-    bufs.push_back(boost::asio::buffer(resp->get_status_line()));
-    for (auto& h : resp->get_headers()) {
+    //"HTTP/1.1 200 OK\r\n"
+
+//    bufs.push_back(status_strings::to_buffer(resp.get_status_code()));
+//    bufs.push_back(boost::asio::buffer(resp.get_protocol().HTTP_BEGIN));
+//    bufs.push_back(boost::asio::buffer(resp.get_protocol().v_major));
+//    bufs.push_back(boost::asio::buffer("."));
+//    bufs.push_back(boost::asio::buffer(resp.get_protocol().v_minor));
+//    bufs.push_back(boost::asio::buffer(" "));
+//    bufs.push_back(boost::asio::buffer(std::to_string(resp.get_status_code())));
+//    bufs.push_back(boost::asio::buffer(" "));
+//    bufs.push_back(boost::asio::buffer(resp.code_to_str()));
+//    bufs.push_back(boost::asio::buffer(misc::crlf_arr));
+
+    bufs.push_back(boost::asio::buffer(resp.get_status_line()));
+
+
+    for (auto& h : resp.get_headers()) {
         bufs.push_back(boost::asio::buffer(h.get_name()));
         bufs.push_back(boost::asio::buffer(misc::namevalue_sep));
         bufs.push_back(boost::asio::buffer(h.get_value()));
         bufs.push_back(boost::asio::buffer(misc::crlf_arr));
     }
     bufs.push_back(boost::asio::buffer(misc::crlf_arr));
-    bufs.push_back(boost::asio::buffer(resp->get_data(), resp->get_data_size()));
+    if (resp.get_data() != nullptr) {
+        bufs.push_back(boost::asio::buffer(resp.get_data(), resp.get_data_size()));
+    }
     return bufs;
 }

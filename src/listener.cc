@@ -7,7 +7,8 @@ listener::listener(int port, size_t workers_count)
       _workers_count(workers_count),
       _io_manager(new io_service_manager(_workers_count)),
       _signals(_io_manager->get_io_service()),
-      _acceptor(_io_manager->get_io_service())
+      _acceptor(_io_manager->get_io_service()),
+      _request_handler(new request_handler)
 {
     _signals.add(SIGINT);
     _signals.add(SIGTERM);
@@ -17,17 +18,20 @@ listener::listener(int port, size_t workers_count)
 
     init_signal_handlers();
 
-    boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port);
+    boost::asio::ip::tcp::resolver resolver(_acceptor.get_io_service());
+    boost::asio::ip::tcp::resolver::query query("0.0.0.0", std::to_string(port));
+    boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
     _acceptor.open(endpoint.protocol());
     _acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
     _acceptor.bind(endpoint);
     _acceptor.listen();
 
-    accept_handler();
+    exec_accept();
 }
 
 listener::~listener()
 {
+    delete _request_handler;
     delete _io_manager;
 }
 
@@ -38,21 +42,16 @@ void listener::run()
 }
 
 
-void listener::accept_handler()
+void listener::exec_accept()
 {
-    _connection.reset(new connection(_io_manager->get_io_service()));
+    _connection.reset(new connection(_io_manager->get_io_service(), *_request_handler));
     _acceptor.async_accept(_connection->socket(),
         [this](boost::system::error_code ec) {
-            if (!_acceptor.is_open()) {
-                return;
-            }
-
             if (!ec) {
-                std::cout << "Got connection\n";
                 _connection->run();
             }
 
-            accept_handler();
+            exec_accept();
         }
     );
 }
@@ -61,7 +60,6 @@ void listener::init_signal_handlers()
 {
     _signals.async_wait(
         [this](boost::system::error_code /*ec*/, int /*signo*/) {
-            _acceptor.close();
             _io_manager->stop();
     });
 }

@@ -2,6 +2,7 @@
 #define CONNECTION_H
 
 #include "http/request.h"
+#include "http/request_handler.h"
 #include "http/response.h"
 
 #include <memory>
@@ -15,7 +16,7 @@ class connection : public boost::enable_shared_from_this<connection>,
 {
     typedef boost::asio::ip::tcp::socket socket_t;
 public:
-    explicit connection(boost::asio::io_service& io_service);
+    explicit connection(boost::asio::io_service& io_service, request_handler& req_handler);
     ~connection();
 
     void run();
@@ -24,14 +25,15 @@ public:
 private:
     void exec_read();
     void read_handle(boost::system::error_code e, size_t bytes);
-    void write_handle(boost::system::error_code e, size_t bytes);
-    static std::vector<boost::asio::const_buffer> to_asio_buffers(const response* resp);
+    void write_handle(boost::system::error_code e);
+    static std::vector<boost::asio::const_buffer> to_asio_buffers(response& resp);
 
 private:
     socket_t _socket;
-    std::array<char, 1024> _buf;
+    std::array<char, 8192> _buf;
     request* _req;
     response* _resp;
+    request_handler& _request_handler;
 };
 
 typedef boost::shared_ptr<connection> connection_ptr;

@@ -20,13 +20,14 @@ http_server::http_server(const std::string& config_path)
 http_server::~http_server()
 {
     delete _listener;
+    _listener = nullptr;
 }
 
 void http_server::run()
 {
     std::cout << "Starting server..." << std::endl;
     auto conf = server_config::instance();
-    _listener = new listener(conf.get_port(), 4);
+    _listener = new listener(conf.get_port(), 16);
     _listener->run();
     std::cout << "Server stopped" << std::endl;
 }

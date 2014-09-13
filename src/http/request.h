@@ -4,50 +4,15 @@
 #include "methods.h"
 #include "header.h"
 #include "protocol.h"
+#include "chunk.h"
 
 #include <vector>
 #include <string>
 #include <cstring>
 #include <memory>
 
-class chunk
-{
-public:
-    chunk(const char* buf, size_t size)
-        : _data(nullptr),
-          _size(size)
-    {
-        _data = new char[_size];
-        memcpy(_data, buf, _size);
-    }
-
-    ~chunk()
-    {
-        delete[] _data;
-    }
-
-    const char* data()
-    {
-        return _data;
-    }
-
-    size_t size()
-    {
-        return _size;
-    }
-
-private:
-    char* _data;
-    size_t _size;
-};
-
-typedef std::shared_ptr<chunk> chunk_ptr;
-
-
-
 class request
 {
-    static constexpr int FIRST_LINE_SIZE = 3;
 public:
     request();
     ~request();
@@ -56,6 +21,7 @@ public:
 
     methods::method get_method() const;
     const std::string& get_uri() const;
+    const std::string& get_query() const;
     const protocol& get_protocol() const;
     const std::vector<header>& get_headers() const;
     bool is_malformed() const;
@@ -64,18 +30,19 @@ public:
 
 private:
     static request& make_malformed(request& req);
-    static std::string normalize_uri(const std::string& str);
-    std::string merge_chunks() const;
+    void normalize_uri(const std::string& str);
+    std::string merge_middle(const std::vector<std::string>& components);
 
 private:
     methods::method _method;
     std::string _uri;
+    std::string _query;
     protocol _protocol;
     std::vector<header> _headers;
     bool _malformed;
     /// TODO: request body, do we really need it?
 
-    std::vector<chunk_ptr> _chunks;
+    std::vector<chunk::ptr> _chunks;
 };
 
 

@@ -1,17 +1,11 @@
 #include "request_handler.h"
 #include "../config/server_config.h"
-#include "../fs/file_not_in_doc_root_error.h"
+#include "../fs/file_access_denied.h"
 #include "../fs/file_error.h"
 
 #include <ctime>
 #include <sstream>
-
-
-request_handler& request_handler::instance()
-{
-    static request_handler rh;
-    return rh;
-}
+#include <thread>
 
 void request_handler::handle(request* req, response* resp)
 {
@@ -23,40 +17,42 @@ void request_handler::handle(request* req, response* resp)
 
 void request_handler::handle_internal(request* req, response* resp)
 {
-    file f;
+    std::cout << std::this_thread::get_id() << "  " << req->get_uri() << std::endl;
+
+    auto f = boost::make_shared<file>();
     if (req->is_malformed()) {
-        make_bad_request(resp);
+        make_bad_request(f, resp);
         return;
     }
 
     if (!filter_request(req)) {
-        f.load("Method not allowed");
+        f->load("Method not allowed mothefuckers");
         resp->set_status(status_codes::METHOD_NOT_ALLOWED);
-        resp->assign_data(&f);
+        resp->assign_data(f);
         return;
     }
 
     std::string uri;
     bool decode_res = url_decode(req->get_uri(), uri);
     if (!decode_res) {
-        make_bad_request(resp);
+        make_bad_request(f, resp);
         return;
     }
 
     auto m = req->get_method();
 
     try {
-        _freader.read(uri.c_str(), &f, m != methods::HEAD);
-        resp->assign_data(&f);
+        _freader.read(uri, f, m != methods::HEAD);
+        resp->assign_data(f);
         resp->set_status(status_codes::OK);
-    } catch (file_not_in_doc_root_error& e) {
+    } catch (file_access_denied& e) {
         resp->set_status(status_codes::FORBIDDEN);
-        f.load("File \"" + uri + "\" is forbidden");
-        resp->assign_data(&f);
+        f->load("File \"" + uri + "\" is forbidden");
+        resp->assign_data(f);
     } catch (file_error& e) {
         resp->set_status(status_codes::NOT_FOUND);
-        f.load("File \"" + uri + "\" not found");
-        resp->assign_data(&f);
+        f->load("File \"" + uri + "\" not found");
+        resp->assign_data(f);
     }
 }
 
@@ -113,9 +109,10 @@ bool request_handler::url_decode(const std::string& in, std::string& out)
     return true;
 }
 
-void request_handler::make_bad_request(response* resp)
+void request_handler::make_bad_request(file_ptr f, response* resp)
 {
-    resp->assign_data("Bad request");
+    f->load("Bad request");
+    resp->assign_data(f);
     resp->add_header(common_headers::content_type(mime_types::text_plain));
     resp->set_status(status_codes::BAD_REQUEST);
 }
