@@ -9,7 +9,7 @@
 class file_reader
 {
 public:
-    file_reader(const std::string& doc_root);
+    file_reader(const std::string& doc_root, const std::string& index_filename);
     void read(const char* src, file* out, bool do_reading = true);
 
 private:
@@ -17,6 +17,7 @@ private:
 
 private:
     std::string _doc_root;
+    std::string _index_filename;
 };
 
 #endif // FILE_READER_H

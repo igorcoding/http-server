@@ -5,8 +5,9 @@
 #include <fstream>
 #include <iostream>
 
-file_reader::file_reader(const std::string& doc_root)
-    : _doc_root(doc_root)
+file_reader::file_reader(const std::string& doc_root, const std::string& index_filename)
+    : _doc_root(doc_root),
+      _index_filename(index_filename)
 {
 }
 
@@ -31,6 +32,16 @@ void file_reader::read(const char* src, file* out, bool do_reading)
 
     if (!path_contains_file(doc_root_path, src_path)) {
         throw file_not_in_doc_root_error();
+    }
+
+    try {
+        if (is_directory(src_path)) {
+            src_path.clear();
+            src_path = path("/" + _index_filename);
+            src_path = canonical(absolute(doc_root_path / src_path));
+        }
+    } catch (std::exception& e) {
+        throw file_error("File not found");
     }
 
     std::fstream fs;

@@ -27,19 +27,23 @@ void file::load(const char* data, size_t size, mime_types::mime_type type)
 void file::load(const std::string& s)
 {
     load(s.c_str(), s.length(), mime_types::text_plain);
+    _do_delete = false;
 }
 
 file::file()
     : _data(nullptr),
       _size(0),
-      _type(mime_types::text_plain)
+      _type(mime_types::text_plain),
+      _do_delete(true)
 { }
 
 file::~file()
 {
-    delete[] _data;
-    _size = 0;
-    _type = mime_types::text_plain;
+    if (_do_delete) {
+        delete[] _data;
+        _size = 0;
+        _type = mime_types::text_plain;
+    }
 }
 
 const char* file::get_data() const

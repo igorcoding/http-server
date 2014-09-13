@@ -6,9 +6,12 @@ request::request()
     : _malformed(false)
 { }
 
+request::~request()
+{
+}
+
 void request::parse(const std::string& raw_request)
 {
-    _raw = raw_request;
     std::vector<std::string> lines;
     std::string splitter(misc::crlf);
     misc::split(raw_request, splitter, lines);
@@ -39,6 +42,19 @@ void request::parse(const std::string& raw_request)
     } catch (malformed_request& e) {
         make_malformed(*this);
     }
+}
+
+bool request::add_chunk(const char* data, size_t size)
+{
+    _chunks.push_back(std::make_shared<chunk>(data, size));
+    auto last = _chunks.back()->data();
+    // TODO
+    if (memcmp(last + size - 4, misc::double_crlf, 4) == 0) {
+        auto merged = merge_chunks();
+        parse(merged);
+        return true;
+    }
+    return false;
 }
 
 methods::method request::get_method() const
@@ -72,6 +88,26 @@ std::string request::normalize_uri(const std::string& uri)
     return normalized;
 }
 
+std::string request::merge_chunks() const
+{
+    size_t total_size = 0;
+    for (auto& c : _chunks) {
+        total_size += c->size();
+    }
+
+    char* merged = new char[total_size];
+    size_t offset = 0;
+    for (auto c : _chunks) {
+        memcpy(merged + offset, c->data(), c->size());
+        offset += c->size();
+    }
+
+    auto s = std::string(merged, total_size);
+    delete[] merged;
+    merged = nullptr;
+    return s;
+}
+
 request& request::make_malformed(request& req)
 {
     req._malformed = true;
@@ -82,6 +118,3 @@ bool request::is_malformed() const {
     return _malformed;
 }
 
-const std::string& request::get_raw() const {
-    return _raw;
-}

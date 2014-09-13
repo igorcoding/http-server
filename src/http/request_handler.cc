@@ -18,6 +18,7 @@ void request_handler::handle(request* req, response* resp)
     handle_internal(req, resp);
     resp->add_header(common_headers::date(get_current_time()));
     resp->add_header(common_headers::connection(common_headers::connection_state::close));
+    resp->add_header(common_headers::server("igorcoding's Http Server"));
 }
 
 void request_handler::handle_internal(request* req, response* resp)
@@ -41,9 +42,7 @@ void request_handler::handle_internal(request* req, response* resp)
         make_bad_request(resp);
         return;
     }
-    if (uri == "/") {
-        uri = "/" + server_config::instance().get_index_filename();
-    }
+
     auto m = req->get_method();
 
     try {
@@ -122,7 +121,7 @@ void request_handler::make_bad_request(response* resp)
 }
 
 request_handler::request_handler()
-    : _freader(server_config::instance().get_document_root())
+    : _freader(server_config::instance().get_document_root(), server_config::instance().get_index_filename())
 {
 
 }

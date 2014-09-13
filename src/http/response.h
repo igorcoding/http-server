@@ -40,13 +40,15 @@ public:
     template<typename InputIterator> void assign_headers(InputIterator first, InputIterator last);
     void add_header(const header& h);
 
-    size_t get_data_size() {
-        return _data_size;
-    }
-
     std::string build();
+    protocol get_protocol() const;
+    status_codes::status_code get_status_code() const;
+    std::string get_status_line() const;
+    const std::vector<header>& get_headers() const;
+    const char* get_data() const;
+    size_t get_data_size() const;
 
-private:
+
     static std::string code_to_str(status_codes::status_code code);
 
 private:

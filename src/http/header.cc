@@ -94,6 +94,7 @@ header common_headers::content_type(mime_types::mime_type mime)
         break;
     case application_x_shockwave_flash:
         m = "application/x-shockwave-flash";
+        break;
     default:
         m = "text/plain";
         break;

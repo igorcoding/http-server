@@ -71,6 +71,40 @@ std::string response::build()
     return ss.str();
 }
 
+protocol response::get_protocol() const
+{
+    return _protocol;
+}
+
+status_codes::status_code response::get_status_code() const
+{
+    return _status_code;
+}
+
+std::string response::get_status_line() const
+{
+    std::stringstream ss;
+    ss << _protocol.to_string() << " "
+       << static_cast<int>(_status_code) << " "
+       << code_to_str(_status_code) << misc::crlf;
+    return ss.str();
+}
+
+const std::vector<header>&response::get_headers() const
+{
+    return _headers;
+}
+
+const char*response::get_data() const
+{
+    return _data;
+}
+
+size_t response::get_data_size() const
+{
+    return _data_size;
+}
+
 std::string response::code_to_str(status_codes::status_code code)
 {
     using namespace status_codes;

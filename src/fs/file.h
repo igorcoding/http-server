@@ -39,6 +39,7 @@ private:
     const char* _data;
     size_t _size;
     mime_types::mime_type _type;
+    bool _do_delete;
 
     static std::map<std::string, mime_types::mime_type> _mimes;
 };
