@@ -28,7 +28,8 @@ SOURCES += \
     src/connection.cc \
     src/io_service_manager.cc \
     src/fs/file_access_denied.cc \
-    src/http/chunk.cc
+    src/http/chunk.cc \
+    src/fs/cache.cc
 
 HEADERS += \
     src/http_server.h \
@@ -56,7 +57,8 @@ HEADERS += \
     src/connection.h \
     src/io_service_manager.h \
     src/fs/file_access_denied.h \
-    src/http/chunk.h
+    src/http/chunk.h \
+    src/fs/cache.h
 
 
 unix {

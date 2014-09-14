@@ -5,10 +5,10 @@
 listener::listener(int port, size_t workers_count)
     : _port(port),
       _workers_count(workers_count),
-      _io_manager(new io_service_manager(_workers_count)),
-      _signals(_io_manager->get_io_service()),
-      _acceptor(_io_manager->get_io_service()),
-      _request_handler(new request_handler)
+      _io_manager(_workers_count),
+      _signals(_io_manager.get_io_service()),
+      _acceptor(_io_manager.get_io_service()),
+      _request_handler()
 {
     _signals.add(SIGINT);
     _signals.add(SIGTERM);
@@ -31,20 +31,18 @@ listener::listener(int port, size_t workers_count)
 
 listener::~listener()
 {
-    delete _request_handler;
-    delete _io_manager;
 }
 
 void listener::run()
 {
     std::cout << "Listening :" << _port << std::endl;
-    _io_manager->run();
+    _io_manager.run();
 }
 
 
 void listener::exec_accept()
 {
-    _connection.reset(new connection(_io_manager->get_io_service(), *_request_handler));
+    _connection.reset(new connection(_io_manager.get_io_service(), _request_handler));
     _acceptor.async_accept(_connection->socket(),
         [this](boost::system::error_code ec) {
             if (!ec) {
@@ -60,6 +58,6 @@ void listener::init_signal_handlers()
 {
     _signals.async_wait(
         [this](boost::system::error_code /*ec*/, int /*signo*/) {
-            _io_manager->stop();
+            _io_manager.stop();
     });
 }

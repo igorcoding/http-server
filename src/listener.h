@@ -27,11 +27,11 @@ private:
 private:
     int _port;
     size_t _workers_count;
-    io_service_manager* _io_manager;
+    io_service_manager _io_manager;
     boost::asio::signal_set _signals;
     boost::asio::ip::tcp::acceptor _acceptor;
     connection_ptr _connection;
-    request_handler* _request_handler;
+    request_handler _request_handler;
 };
 
 #endif // LISTENER_H

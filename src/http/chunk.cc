@@ -14,7 +14,7 @@ chunk::ptr chunk::merge_chunks(const std::vector<chunk::ptr>& chunks)
         offset += c->size();
     }
 
-    auto ch = boost::make_shared<chunk>(merged, total_size);
+    auto ch = new chunk(merged, total_size);
     delete[] merged;
     merged = nullptr;
     return ch;

@@ -8,6 +8,9 @@ request::request()
 
 request::~request()
 {
+    for (size_t i = 0; i < _chunks.size(); ++i) {
+        delete _chunks[i];
+    }
 }
 
 void request::parse(const std::string& raw_request)
@@ -44,13 +47,14 @@ void request::parse(const std::string& raw_request)
 
 bool request::add_chunk(const char* data, size_t size)
 {
-    _chunks.push_back(boost::make_shared<chunk>(data, size));
+    _chunks.push_back(new chunk(data, size));
     auto last = _chunks.back()->data();
     // TODO
     auto finished = strstr(last, misc::double_crlf);
     if (finished != nullptr) {
-        auto merged = chunk::merge_chunks(_chunks);
+        chunk::ptr merged = chunk::merge_chunks(_chunks);
         parse(std::string(merged->data(), merged->size()));
+        delete merged;
         return true;
     }
     return false;

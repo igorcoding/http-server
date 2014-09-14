@@ -45,6 +45,7 @@ boost::asio::io_service& io_service_manager::get_io_service()
 
 size_t io_service_manager::next_io()
 {
+//    return _rand();
     ++_current_io;
     if (_current_io >= _io_services.size()) {
         _current_io = 0;

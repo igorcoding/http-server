@@ -16,26 +16,30 @@ std::map<std::string, mime_types::mime_type> file::_mimes
                                                                 (".png", mime_types::image_png)
                                                                 (".swf", mime_types::application_x_shockwave_flash);
 
-void file::load(const char* data, size_t size, mime_types::mime_type type)
+void file::load(char* data, size_t size, mime_types::mime_type type, bool reqire_delete)
 {
     delete[] _data;
     _size = size;
     _type = type;
-    if (data != nullptr) {
-        _data = new char[size];
-        memcpy(_data, data, size);
-    }
+    _data = data;
+    _require_delete = reqire_delete;
 }
 
 void file::load(const std::string& s)
 {
-    load(s.c_str(), s.length(), mime_types::text_plain);
+    delete[] _data;
+    _size = s.length();
+    _type = mime_types::text_plain;
+    _require_delete = true;
+    _data = new char[_size];
+    memcpy(_data, s.c_str(), _size);
 }
 
 file::file()
     : _data(nullptr),
       _size(0),
-      _type(mime_types::text_plain)
+      _type(mime_types::text_plain),
+      _require_delete(true)
 { }
 
 file::~file()
@@ -45,7 +49,7 @@ file::~file()
     _type = mime_types::text_plain;
 }
 
-const char* file::get_data() const
+char* file::get_data() const
 {
     return _data;
 }
@@ -63,6 +67,11 @@ mime_types::mime_type file::get_mime() const
 bool file::is_empty() const
 {
     return _data == nullptr;
+}
+
+bool file::is_delete_required() const
+{
+    return _require_delete;
 }
 
 mime_types::mime_type file::guess_mime(const std::string& extension)

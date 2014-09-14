@@ -3,36 +3,7 @@
 
 #include <sstream>
 
-namespace status_strings {
-
-const std::string OK = "HTTP/1.1 200 OK\r\n";
-const std::string BAD_REQUEST = "HTTP/1.1 400 Bad Request\r\n";
-const std::string FORBIDDEN = "HTTP/1.1 403 Forbidden\r\n";
-const std::string NOT_FOUND = "HTTP/1.1 404 Not Found\r\n";
-const std::string METHOD_NOT_ALLOWED = "HTTP/1.1 405 Method Not Allowed\r\n";
-const std::string INTERNAL_SERVER_ERROR = "HTTP/1.1 500 Internal Server Error\r\n";
-
-boost::asio::const_buffer to_buffer(status_codes::status_code code)
-{
-    switch (code) {
-    case status_codes::OK:
-        return boost::asio::buffer(OK);
-    case status_codes::BAD_REQUEST:
-        return boost::asio::buffer(BAD_REQUEST);
-    case status_codes::FORBIDDEN:
-        return boost::asio::buffer(FORBIDDEN);
-    case status_codes::NOT_FOUND:
-        return boost::asio::buffer(NOT_FOUND);
-    case status_codes::METHOD_NOT_ALLOWED:
-        return boost::asio::buffer(METHOD_NOT_ALLOWED);
-    default:
-        return boost::asio::buffer(INTERNAL_SERVER_ERROR);
-    }
-}
-
-} // namespace status_strings
-
-const protocol response::_protocol = { "1", "1" };
+const protocol response::_protocol = { 1, 1 };
 
 response::response()
     : _data(nullptr)
@@ -42,6 +13,8 @@ response::response()
 
 response::~response()
 {
+    if (_data != nullptr && _data->is_delete_required())
+        delete _data;
 }
 
 void response::assign_data(file_ptr f)

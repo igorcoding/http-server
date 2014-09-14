@@ -17,9 +17,9 @@ void request_handler::handle(request* req, response* resp)
 
 void request_handler::handle_internal(request* req, response* resp)
 {
-    std::cout << std::this_thread::get_id() << "  " << req->get_uri() << std::endl;
+//    std::cout << std::this_thread::get_id() << "  " << req->get_uri() << std::endl;
 
-    auto f = boost::make_shared<file>();
+    auto f = new file;
     if (req->is_malformed()) {
         make_bad_request(f, resp);
         return;

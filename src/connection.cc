@@ -63,18 +63,6 @@ void connection::write_handle(boost::system::error_code e)
 std::vector<boost::asio::const_buffer> connection::to_asio_buffers(response& resp)
 {
     std::vector<boost::asio::const_buffer> bufs;
-    //"HTTP/1.1 200 OK\r\n"
-
-//    bufs.push_back(status_strings::to_buffer(resp.get_status_code()));
-//    bufs.push_back(boost::asio::buffer(resp.get_protocol().HTTP_BEGIN));
-//    bufs.push_back(boost::asio::buffer(resp.get_protocol().v_major));
-//    bufs.push_back(boost::asio::buffer("."));
-//    bufs.push_back(boost::asio::buffer(resp.get_protocol().v_minor));
-//    bufs.push_back(boost::asio::buffer(" "));
-//    bufs.push_back(boost::asio::buffer(std::to_string(resp.get_status_code())));
-//    bufs.push_back(boost::asio::buffer(" "));
-//    bufs.push_back(boost::asio::buffer(resp.code_to_str()));
-//    bufs.push_back(boost::asio::buffer(misc::crlf_arr));
 
     bufs.push_back(boost::asio::buffer(resp.get_status_line()));
 

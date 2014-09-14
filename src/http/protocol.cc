@@ -12,13 +12,13 @@ protocol protocol::parse(const std::string& str)
     if (version.length() != 3 || version[1] != '.')
         throw malformed_protocol();
 
-    p.v_major = version.substr(0, 1).c_str();
-    p.v_minor = version.substr(2, 1).c_str();
+    p.v_major = atoi(version.substr(0, 1).c_str());
+    p.v_minor = atoi(version.substr(2, 1).c_str());
 
     return p;
 }
 
 std::string protocol::to_string() const
 {
-    return HTTP_BEGIN + v_major + "." + v_minor;
+    return HTTP_BEGIN + std::to_string(v_major) + "." + std::to_string(v_minor);
 }

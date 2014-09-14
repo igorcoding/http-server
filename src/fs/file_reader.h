@@ -2,6 +2,7 @@
 #define FILE_READER_H
 
 #include "file.h"
+#include "cache.h"
 
 #include <boost/filesystem.hpp>
 #include <string>
@@ -13,11 +14,12 @@ public:
     void read(const std::string& src, file_ptr out, bool do_reading = true);
 
 private:
-    bool path_contains_file(boost::filesystem::path dir, boost::filesystem::path file);
+//    bool path_contains_file(boost::filesystem::path dir, boost::filesystem::path file);
 
 private:
     std::string _doc_root;
     std::string _index_filename;
+    cache _cache;
 };
 
 #endif // FILE_READER_H

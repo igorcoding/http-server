@@ -9,7 +9,7 @@
 class chunk
 {
 public:
-    typedef boost::shared_ptr<chunk> ptr;
+    typedef chunk* ptr;
 
     chunk(const char* buf, size_t size)
         : _data(nullptr),
