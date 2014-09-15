@@ -12,12 +12,14 @@ server_config::server_config(const std::string& ip,
                              int port,
                              const std::string& doc_root,
                              const std::string& index_filename,
-                             size_t workers_count)
+                             size_t workers_count,
+                             double cache_period)
     : _ip(ip),
       _port(port),
       _doc_root(doc_root),
       _index_filename(index_filename),
-      _workers_count(workers_count)
+      _workers_count(workers_count),
+      _cache_period(cache_period)
 { }
 
 void server_config::set_config_path(const std::string& path)
@@ -56,6 +58,11 @@ size_t server_config::get_workers_count() const
     return _workers_count;
 }
 
+double server_config::get_cache_period() const
+{
+    return _cache_period;
+}
+
 void server_config::load_config()
 {
     boost::property_tree::ptree tree;
@@ -65,10 +72,11 @@ void server_config::load_config()
     _doc_root = tree.get("document_root", default_config()._doc_root);
     _index_filename = tree.get("index_filename", default_config()._index_filename);
     _workers_count = static_cast<size_t>(tree.get("workers_count", default_config()._workers_count));
+    _cache_period = tree.get("cache_period", default_config()._cache_period);
 }
 
 
 server_config& server_config::default_config() {
-    static server_config default_conf("127.0.0.1", 80, "./", "index.html", 8);
+    static server_config default_conf("127.0.0.1", 80, "./", "index.html", 8, 60);
     return default_conf;
 }

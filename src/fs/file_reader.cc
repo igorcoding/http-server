@@ -1,13 +1,15 @@
 #include "file_reader.h"
 #include "file_error.h"
 #include "file_access_denied.h"
+#include "../config/server_config.h"
 
 #include <fstream>
 #include <iostream>
 
 file_reader::file_reader(const std::string& doc_root, const std::string& index_filename)
     : _doc_root(doc_root),
-      _index_filename(index_filename)
+      _index_filename(index_filename),
+      _cache(server_config::instance().get_cache_period())
 {
 }
 

@@ -3,5 +3,6 @@
     "port": 8082,
     "document_root": "/home/igor/Documents/www",
     "index_filename": "index.html",
-    "workers_count": 16
+    "workers_count": 16,
+    "cache_period": 60
 }
