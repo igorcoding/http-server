@@ -11,12 +11,9 @@ file_reader::file_reader(const std::string& doc_root, const std::string& index_f
 {
 }
 
-void file_reader::read(const std::string& src, file_ptr out, bool do_reading)
+file_ptr file_reader::read(const std::string& src, bool do_reading)
 {
     using namespace boost::filesystem;
-
-    if (out == nullptr)
-        return;
 
     path doc_root_path(_doc_root);
     doc_root_path = canonical(absolute(doc_root_path));
@@ -43,8 +40,8 @@ void file_reader::read(const std::string& src, file_ptr out, bool do_reading)
 //    }
 
     auto s_path = src_path.generic_string();
-//    auto res = _cache.get(s_path);
-//    if (res == nullptr) {
+    auto res = _cache.get(s_path);
+    if (res == nullptr) {
         std::fstream fs;
         fs.open(s_path, std::ios::in | std::ios::binary | std::ios::ate);
         if (fs.is_open()) {
@@ -58,14 +55,17 @@ void file_reader::read(const std::string& src, file_ptr out, bool do_reading)
             }
             fs.close();
 
-            out->load(data, size, file::guess_mime(src_path.extension().generic_string()));
-//            _cache.add(s_path, out);
+            auto out = new file;
+            out->load(data, size, file::guess_mime(src_path.extension().generic_string()), false);
+            _cache.add(s_path, out);
+
+            return out;
         } else {
             throw file_error("File not found");
         }
-//    } else {
-//        out->load(res->get_data(), res->get_size(), res->get_mime(), false);
-//    }
+    } else {
+        return res;
+    }
 }
 
 //bool file_reader::path_contains_file(boost::filesystem::path dir, boost::filesystem::path file)

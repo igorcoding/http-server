@@ -13,10 +13,11 @@ public:
     int get_port() const;
     const std::string& get_document_root() const;
     const std::string& get_index_filename() const;
+    size_t get_workers_count() const;
 
 private:
     server_config();
-    server_config(const std::string& ip, int port, const std::string& doc_root, const std::string& index_filename);
+    server_config(const std::string& ip, int port, const std::string& doc_root, const std::string& index_filename, size_t workers_count);
     static server_config& default_config();
     void load_config();
 
@@ -27,6 +28,7 @@ private:
     int _port;
     std::string _doc_root;
     std::string _index_filename;
+    size_t _workers_count;
 };
 
 #endif // SERVER_CONFIG_H

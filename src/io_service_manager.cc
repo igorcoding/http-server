@@ -24,6 +24,7 @@ void io_service_manager::run()
         thread_ptr th(new boost::thread(boost::bind(&boost::asio::io_service::run, _io_services[i])));
         _threads.push_back(th);
     }
+    std::cout << "Started " << _workers_count << " workers." << std::endl;
 
     for (auto& th : _threads) {
         th->join();

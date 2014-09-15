@@ -17,7 +17,7 @@ private:
     bool filter_request(request* req);
     bool url_decode(const std::string& in, std::string& out);
 
-    void make_bad_request(file_ptr f, response* resp);
+    void make_bad_request(response* resp);
 
 private:
     request_handler(const request_handler& rh) = delete;
