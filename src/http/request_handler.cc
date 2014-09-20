@@ -24,7 +24,7 @@ void request_handler::handle_internal(request* req, response* resp)
     }
 
     if (!filter_request(req)) {
-        auto f = new file;
+        auto f = boost::make_shared<file>();
         f->load("Method not allowed mothefuckers");
         resp->set_status(status_codes::METHOD_NOT_ALLOWED);
         resp->assign_data(f);
@@ -46,12 +46,12 @@ void request_handler::handle_internal(request* req, response* resp)
         resp->set_status(status_codes::OK);
     } catch (file_access_denied& e) {
         resp->set_status(status_codes::FORBIDDEN);
-        auto f = new file;
+        auto f = boost::make_shared<file>();
         f->load("File \"" + uri + "\" is forbidden");
         resp->assign_data(f);
     } catch (file_error& e) {
         resp->set_status(status_codes::NOT_FOUND);
-        auto f = new file;
+        auto f = boost::make_shared<file>();
         f->load("File \"" + uri + "\" not found");
         resp->assign_data(f);
     }
@@ -112,7 +112,7 @@ bool request_handler::url_decode(const std::string& in, std::string& out)
 
 void request_handler::make_bad_request(response* resp)
 {
-    auto f = new file();
+    auto f = boost::make_shared<file>();
     f->load("Bad request");
     resp->assign_data(f);
     resp->add_header(common_headers::content_type(mime_types::text_plain));

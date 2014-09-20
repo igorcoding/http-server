@@ -48,6 +48,6 @@ private:
     static std::map<std::string, mime_types::mime_type> _mimes;
 };
 
-typedef file* file_ptr;
+typedef boost::shared_ptr<file> file_ptr;
 
 #endif // FILE_H

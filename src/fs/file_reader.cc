@@ -5,6 +5,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <boost/make_shared.hpp>
 
 file_reader::file_reader(const std::string& doc_root, const std::string& index_filename)
     : _doc_root(doc_root),
@@ -57,7 +58,7 @@ file_ptr file_reader::read(const std::string& src, bool do_reading)
             }
             fs.close();
 
-            auto out = new file;
+            auto out = boost::make_shared<file>();
             out->load(data, size, file::guess_mime(src_path.extension().generic_string()), false);
             _cache.add(s_path, out);
 

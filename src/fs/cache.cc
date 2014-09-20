@@ -49,7 +49,8 @@ cache_entry::cache_entry(file_ptr file, int remove_time)
 
 cache_entry::~cache_entry()
 {
-    delete _file;
+//    delete _file;
+//    _file = nullptr;
 }
 
 bool cache_entry::check_to_delete()

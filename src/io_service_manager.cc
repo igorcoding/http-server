@@ -33,7 +33,7 @@ void io_service_manager::run()
 
 void io_service_manager::stop()
 {
-    for (auto& io : _io_services) {
+    for (auto io : _io_services) {
         io->stop();
     }
 }
@@ -42,6 +42,11 @@ boost::asio::io_service& io_service_manager::get_io_service()
 {
     auto id = next_io();
     return *_io_services[id];
+}
+
+boost::asio::io_service& io_service_manager::get_first_io_service()
+{
+    return *_io_services[0];
 }
 
 size_t io_service_manager::next_io()

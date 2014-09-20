@@ -59,5 +59,6 @@ void listener::init_signal_handlers()
     _signals.async_wait(
         [this](boost::system::error_code /*ec*/, int /*signo*/) {
             _io_manager.stop();
+            _connection.reset();
     });
 }

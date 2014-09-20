@@ -21,6 +21,7 @@ public:
     void run();
     void stop();
     boost::asio::io_service& get_io_service();
+    boost::asio::io_service& get_first_io_service();
 
 private:
     size_t next_io();

@@ -53,7 +53,6 @@ HEADERS += \
     src/http/protocol.h \
     src/config/config_read_error.h \
     src/http/request_handler.h \
-    src/worker.h \
     src/connection.h \
     src/io_service_manager.h \
     src/fs/file_access_denied.h \
@@ -64,8 +63,9 @@ HEADERS += \
 unix {
     LIBS += -lboost_system \
             -lboost_filesystem \
-            -lboost_thread
+            -lboost_thread \
+            -lboost_program_options
 }
 
 OTHER_FILES += \
-    test_config.json
+    http.conf

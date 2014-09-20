@@ -13,8 +13,8 @@ response::response()
 
 response::~response()
 {
-    if (_data != nullptr && _data->is_delete_required())
-        delete _data;
+//    if (_data != nullptr && _data->is_delete_required())
+//        delete _data;
 }
 
 void response::assign_data(file_ptr f)

@@ -1,11 +1,37 @@
 #include "http_server.h"
 
 #include <iostream>
+#include <boost/program_options.hpp>
+#include <string>
 
-int main()
+int main(int argc, char** argv)
 {
+    namespace po = boost::program_options;
+    po::options_description desc("Allowed options");
+    std::string config_location;
+    desc.add_options()
+        ("help,h", "Produce help message")
+        ("config,c", po::value<std::string>(&config_location)->default_value("./http.conf"), "Server config location")
+    ;
+
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+
+    if (vm.count("help")) {
+        std::cout << desc << std::endl;
+        return 1;
+    }
+
+    if (!vm.count("config")) {
+        std::cout << "Using default config." << std::endl;
+    }
+
+
+    std::cout << config_location << std::endl;
+
     try {
-        http_server server("/home/igor/Projects/cpp/http-server/test_config.json");
+        http_server server(config_location);
         server.run();
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
