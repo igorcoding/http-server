@@ -16,13 +16,14 @@ std::map<std::string, mime_types::mime_type> file::_mimes
                                                                 (".png", mime_types::image_png)
                                                                 (".swf", mime_types::application_x_shockwave_flash);
 
-void file::load(char* data, size_t size, mime_types::mime_type type, bool reqire_delete)
+void file::load(char* data, size_t size, mime_types::mime_type type, bool reqire_delete, int expires)
 {
     delete[] _data;
     _size = size;
     _type = type;
     _data = data;
     _require_delete = reqire_delete;
+    _expires = expires;
 }
 
 void file::load(const std::string& s)
@@ -33,13 +34,20 @@ void file::load(const std::string& s)
     _require_delete = true;
     _data = new char[_size];
     memcpy(_data, s.c_str(), _size);
+    _expires = -1;
+}
+
+file::ptr file::make_file()
+{
+    return new file();
 }
 
 file::file()
     : _data(nullptr),
       _size(0),
       _type(mime_types::text_plain),
-      _require_delete(true)
+      _require_delete(true),
+      _expires(-1)
 { }
 
 file::~file()
@@ -72,6 +80,11 @@ bool file::is_empty() const
 bool file::is_delete_required() const
 {
     return _require_delete;
+}
+
+int file::get_expires() const
+{
+    return _expires;
 }
 
 mime_types::mime_type file::guess_mime(const std::string& extension)

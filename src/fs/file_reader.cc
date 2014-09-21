@@ -14,7 +14,7 @@ file_reader::file_reader(const std::string& doc_root, const std::string& index_f
 {
 }
 
-file_ptr file_reader::read(const std::string& src, bool do_reading)
+file::ptr file_reader::read(const std::string& src, bool do_reading)
 {
     using namespace boost::filesystem;
 
@@ -41,30 +41,42 @@ file_ptr file_reader::read(const std::string& src, bool do_reading)
 
     auto s_path = src_path.generic_string();
     auto res = _cache.get(s_path);
-    if (res == nullptr) {
-        std::fstream fs;
-        fs.open(s_path, std::ios::in | std::ios::binary | std::ios::ate);
-        if (fs.is_open()) {
-            int size = fs.tellg();
-            fs.seekg(0, std::ios::beg);
-
-            char* data = nullptr;
-            if (do_reading) {
-                data = new char[size];
-                fs.read(data, size);
-            }
-            fs.close();
-
-            auto out = boost::make_shared<file>();
-            out->load(data, size, file::guess_mime(src_path.extension().generic_string()), false);
-            _cache.add(s_path, out);
-
-            return out;
-        } else {
-            throw file_error("File not found");
-        }
-    } else {
+    if (res != nullptr) {
         return res;
+    } else {
+        std::cout << "cache doesn't have this entry\n";
+        std::lock_guard<std::mutex> lk(_m);
+        std::cout << "Mutex locked\n";
+
+        if ((res = _cache.get(s_path)) == nullptr) {
+            std::fstream fs;
+            fs.open(s_path, std::ios::in | std::ios::binary | std::ios::ate);
+            if (fs.is_open()) {
+                int size = fs.tellg();
+                fs.seekg(0, std::ios::beg);
+
+                char* data = nullptr;
+                if (do_reading) {
+                    data = new char[size];
+                    fs.read(data, size);
+                }
+                fs.close();
+
+                auto out = file::make_file();
+                out->load(data, size, file::guess_mime(src_path.extension().generic_string()), false, _cache.count_expires());
+                _cache.add(s_path, out);
+
+                std::cout << "Mutex unlocked (added to cache)\n";
+                return out;
+            } else {
+                std::cout << "Mutex unlocked (not found)\n";
+                throw file_error("File not found");
+            }
+        } else {
+            std::cout << "Mutex unlocked (file is in cache)\n";
+            return res;
+        }
+
     }
 }
 

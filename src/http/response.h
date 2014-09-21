@@ -41,7 +41,7 @@ public:
         _status_code = status_code;
     }
 
-    void assign_data(file_ptr f);
+    void assign_data(file::ptr f);
     void add_header(const header& h);
 
 //    std::string build();
@@ -50,6 +50,7 @@ public:
     const std::vector<header>& get_headers() const;
     const char* get_data() const;
     size_t get_data_size() const;
+    time_t get_expires() const;
     std::string& get_status_line();
 
     std::string code_to_str() const;
@@ -58,7 +59,7 @@ private:
     static const protocol _protocol;
     status_codes::status_code _status_code;
     std::vector<header> _headers;
-    file_ptr _data;
+    file::ptr _data;
 
     std::string _status_line;
 };

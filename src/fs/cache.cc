@@ -1,6 +1,7 @@
 #include "cache.h"
 
 #include <ctime>
+#include <boost/make_shared.hpp>
 
 cache::cache(double cache_period)
     : _cache_period(cache_period * 60)
@@ -9,29 +10,34 @@ cache::cache(double cache_period)
 
 cache::~cache()
 {
-    std::cout << "deleting cache\n";
+    std::cout << "Cache size: " << _cache.size() << ". Deleting cache\n";
     for (auto& kv : _cache) {
         delete kv.second;
     }
 }
 
-void cache::add(std::string path, file_ptr f)
+void cache::add(std::string path, file::ptr f)
 {
-    time_t t = time(nullptr);
-    auto t_ms = static_cast<int>(t) + _cache_period;
-    _cache[path] = new cache_entry(f, t_ms);
+    _cache[path] = f;
 }
 
-file_ptr cache::get(const std::string& path)
+file::ptr cache::get(const std::string& path)
 {
     auto it = _cache.find(path);
     if (it == _cache.end())
         return nullptr;
-    if (it->second->check_to_delete()) {
+    if (check_to_delete(it->second)) {
         remove(it);
         return nullptr;
     }
-    return it->second->file();
+    return it->second;
+}
+
+int cache::count_expires()
+{
+    time_t t = time(nullptr);
+    auto t_sec = static_cast<int>(t) + _cache_period;
+    return t_sec;
 }
 
 void cache::remove(cache_type::iterator it)
@@ -41,26 +47,10 @@ void cache::remove(cache_type::iterator it)
 }
 
 
-cache_entry::cache_entry(file_ptr file, int remove_time)
-{
-    _file = file;
-    _remove_time = remove_time;
-}
-
-cache_entry::~cache_entry()
-{
-//    delete _file;
-//    _file = nullptr;
-}
-
-bool cache_entry::check_to_delete()
+bool cache::check_to_delete(file::ptr f)
 {
     time_t time_now = time(nullptr);
-    auto time_now_ms = static_cast<int>(time_now);
-    return time_now_ms >= _remove_time;
+    auto time_now_sec = static_cast<int>(time_now);
+    return time_now_sec >= f->get_expires();
 }
 
-file_ptr cache_entry::file() const
-{
-    return _file;
-}

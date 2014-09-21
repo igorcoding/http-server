@@ -130,3 +130,8 @@ header common_headers::connection(common_headers::connection_state state)
     }
     return header("Connection", s);
 }
+
+header common_headers::expires(const std::string& expires_date)
+{
+    return header("Expires", expires_date);
+}

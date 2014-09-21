@@ -9,6 +9,7 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 #include <thread>
+#include <atomic>
 
 class listener
 {
@@ -19,6 +20,8 @@ public:
     ~listener();
 
     void run();
+
+    std::atomic_int n;
 
 private:
     void exec_accept();

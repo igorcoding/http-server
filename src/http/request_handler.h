@@ -14,6 +14,7 @@ public:
 private:
     void handle_internal(request* req, response* resp);
     std::string get_current_time();
+    std::string format_time(time_t& time);
     bool filter_request(request* req);
     bool url_decode(const std::string& in, std::string& out);
 

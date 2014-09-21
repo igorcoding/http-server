@@ -13,11 +13,11 @@ response::response()
 
 response::~response()
 {
-//    if (_data != nullptr && _data->is_delete_required())
-//        delete _data;
+    if (_data != nullptr && _data->is_delete_required())
+        delete _data;
 }
 
-void response::assign_data(file_ptr f)
+void response::assign_data(file::ptr f)
 {
     _data = f;
     add_header(common_headers::content_type(f->get_mime()));
@@ -82,6 +82,11 @@ const char* response::get_data() const
 size_t response::get_data_size() const
 {
     return _data->get_size();
+}
+
+time_t response::get_expires() const
+{
+    return static_cast<time_t>(_data->get_expires());
 }
 
 std::string response::code_to_str() const

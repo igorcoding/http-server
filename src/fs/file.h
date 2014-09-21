@@ -25,9 +25,12 @@ namespace mime_types {
 class file
 {
 public:
-    file();
+    typedef file* ptr;
+    static file::ptr make_file();
+
+public:
     ~file();
-    void load(char* data, size_t size, mime_types::mime_type type, bool reqire_delete = true);
+    void load(char* data, size_t size, mime_types::mime_type type, bool reqire_delete = true, int expires = -1);
     void load(const std::string& s);
 
     char* get_data() const;
@@ -35,8 +38,12 @@ public:
     mime_types::mime_type get_mime() const;
     bool is_empty() const;
     bool is_delete_required() const;
+    int get_expires() const;
 
     static mime_types::mime_type guess_mime(const std::string& extension);
+
+private:
+    file();
 
 private:
     char* _data;
@@ -44,10 +51,9 @@ private:
     std::string _text_data;
     mime_types::mime_type _type;
     bool _require_delete;
+    int _expires;
 
     static std::map<std::string, mime_types::mime_type> _mimes;
 };
-
-typedef boost::shared_ptr<file> file_ptr;
 
 #endif // FILE_H

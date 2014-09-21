@@ -4,33 +4,23 @@
 #include "file.h"
 
 #include <unordered_map>
-
-class cache_entry
-{
-public:
-    cache_entry(file_ptr file, int remove_time);
-    ~cache_entry();
-    bool check_to_delete();
-
-    file_ptr file() const;
-
-private:
-    file_ptr _file;
-    int _remove_time;
-};
+#include <mutex>
 
 class cache
 {
-    typedef std::unordered_map<std::string, cache_entry*> cache_type;
+    typedef std::unordered_map<std::string, file::ptr> cache_type;
 public:
     cache(double cache_period);
     ~cache();
 
-    void add(std::string path, file_ptr f);
-    file_ptr get(const std::string& path);
+    void add(std::string path, file::ptr f);
+    file::ptr get(const std::string& path);
+
+    int count_expires();
 
 private:
     void remove(cache_type::iterator it);
+    bool check_to_delete(file::ptr f);
 
 private:
     cache_type _cache;

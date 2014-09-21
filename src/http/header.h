@@ -38,6 +38,7 @@ struct common_headers
     static header date(const std::string& date);
     static header server(const std::string& server);
     static header connection(connection_state state);
+    static header expires(const std::string& expires_date);
 };
 
 

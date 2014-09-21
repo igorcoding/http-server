@@ -31,6 +31,7 @@ listener::listener(int port, size_t workers_count)
 
 listener::~listener()
 {
+    std::cout << "cache hits:";
 }
 
 void listener::run()
