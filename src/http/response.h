@@ -9,6 +9,7 @@
 #include <string>
 #include <cstring>
 #include <boost/asio.hpp>
+#include <atomic>
 
 namespace status_codes
 {
@@ -44,7 +45,7 @@ public:
     void assign_data(file::ptr f);
     void add_header(const header& h);
 
-//    std::string build();
+    const std::string& build(bool send_data);
     protocol get_protocol() const;
     status_codes::status_code get_status_code() const;
     const std::vector<header>& get_headers() const;
@@ -55,6 +56,8 @@ public:
 
     std::string code_to_str() const;
 
+    static std::atomic_int n;
+
 private:
     static const protocol _protocol;
     status_codes::status_code _status_code;
@@ -62,6 +65,7 @@ private:
     file::ptr _data;
 
     std::string _status_line;
+    std::string _raw_response;
 };
 
 #endif // RESPONSE_H

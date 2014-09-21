@@ -12,6 +12,7 @@ cache::~cache()
 {
     std::cout << "Cache size: " << _cache.size() << ". Deleting cache\n";
     for (auto& kv : _cache) {
+        std::cout << kv.first << "\n";
         delete kv.second;
     }
 }

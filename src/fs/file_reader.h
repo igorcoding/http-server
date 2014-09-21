@@ -6,7 +6,7 @@
 
 #include <boost/filesystem.hpp>
 #include <string>
-#include <mutex>
+#include <boost/thread/mutex.hpp>
 
 class file_reader
 {
@@ -22,7 +22,7 @@ private:
     std::string _index_filename;
     cache _cache;
 
-    std::mutex _m;
+    boost::mutex _m;
 };
 
 #endif // FILE_READER_H

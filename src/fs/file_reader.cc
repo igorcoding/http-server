@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <boost/make_shared.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 file_reader::file_reader(const std::string& doc_root, const std::string& index_filename)
     : _doc_root(boost::filesystem::canonical(boost::filesystem::absolute(doc_root))),
@@ -39,44 +40,35 @@ file::ptr file_reader::read(const std::string& src, bool do_reading)
 //        throw file_error("Not found");
 //    }
 
+    boost::lock_guard<boost::mutex> lk(_m);
     auto s_path = src_path.generic_string();
     auto res = _cache.get(s_path);
     if (res != nullptr) {
         return res;
     } else {
-        std::cout << "cache doesn't have this entry\n";
-        std::lock_guard<std::mutex> lk(_m);
-        std::cout << "Mutex locked\n";
+//      std::cout << "cache doesn't have this entry\n";
+        std::fstream fs;
+        fs.open(s_path, std::ios::in | std::ios::binary | std::ios::ate);
+        if (fs.is_open()) {
+            int size = fs.tellg();
+            fs.seekg(0, std::ios::beg);
 
-        if ((res = _cache.get(s_path)) == nullptr) {
-            std::fstream fs;
-            fs.open(s_path, std::ios::in | std::ios::binary | std::ios::ate);
-            if (fs.is_open()) {
-                int size = fs.tellg();
-                fs.seekg(0, std::ios::beg);
-
-                char* data = nullptr;
-                if (do_reading) {
-                    data = new char[size];
-                    fs.read(data, size);
-                }
-                fs.close();
-
-                auto out = file::make_file();
-                out->load(data, size, file::guess_mime(src_path.extension().generic_string()), false, _cache.count_expires());
-                _cache.add(s_path, out);
-
-                std::cout << "Mutex unlocked (added to cache)\n";
-                return out;
-            } else {
-                std::cout << "Mutex unlocked (not found)\n";
-                throw file_error("File not found");
+            char* data = nullptr;
+            if (do_reading) {
+                data = new char[size];
+                fs.read(data, size);
             }
-        } else {
-            std::cout << "Mutex unlocked (file is in cache)\n";
-            return res;
-        }
+            fs.close();
 
+            auto out = file::make_file();
+            out->load(data, size, file::guess_mime(src_path.extension().generic_string()), false, _cache.count_expires());
+
+            if (do_reading)
+                _cache.add(s_path, out);
+            return out;
+        } else {
+            throw file_error("File not found");
+        }
     }
 }
 

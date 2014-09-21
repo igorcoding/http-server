@@ -2,6 +2,8 @@
 #include "../util/misc.h"
 #include "exceptions/malformed_components.h"
 
+std::atomic_int request::n(0);
+
 request::request()
     : _malformed(false)
 { }
@@ -15,6 +17,7 @@ request::~request()
 
 void request::parse(const std::string& raw_request)
 {
+    ++n;
     std::vector<std::string> lines;
     std::string splitter(misc::crlf);
     misc::split(raw_request, splitter, lines);
@@ -32,7 +35,7 @@ void request::parse(const std::string& raw_request)
         }
 
         _method = methods::assist::from_str(first_line_components[0]);
-        normalize_uri(merge_middle(first_line_components));
+        normalize_uri(first_line_components[1]);
         _protocol = protocol::parse(first_line_components.back());
 
         for (auto it = lines.begin() + 1; it != lines.end() - 1; ++it) {
@@ -47,14 +50,17 @@ void request::parse(const std::string& raw_request)
 
 bool request::add_chunk(const char* data, size_t size)
 {
+
     _chunks.push_back(new chunk(data, size));
     auto last = _chunks.back()->data();
-    // TODO
+
     auto finished = strstr(last, misc::double_crlf);
     if (finished != nullptr) {
         chunk::ptr merged = chunk::merge_chunks(_chunks);
         parse(std::string(merged->data(), merged->size()));
-        delete merged;
+        if (merged->is_immediate_delete()) {
+            delete merged;
+        }
         return true;
     }
     return false;

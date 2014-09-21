@@ -1,6 +1,7 @@
 #include "io_service_manager.h"
 
 #include <boost/bind.hpp>
+#include <boost/make_shared.hpp>
 
 io_service_manager::io_service_manager(size_t workers_count)
     : _workers_count(workers_count),
@@ -21,12 +22,12 @@ io_service_manager::io_service_manager(size_t workers_count)
 void io_service_manager::run()
 {
     for (size_t i = 0; i < _io_services.size(); ++i) {
-        thread_ptr th(new boost::thread(boost::bind(&boost::asio::io_service::run, _io_services[i])));
-        _threads.push_back(th);
+        _threads.push_back(boost::make_shared<thread_t>(
+                               boost::bind(&boost::asio::io_service::run, _io_services[i])));
     }
     std::cout << "Started " << _workers_count << " workers." << std::endl;
 
-    for (auto& th : _threads) {
+    for (auto th : _threads) {
         th->join();
     }
 }

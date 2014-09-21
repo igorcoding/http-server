@@ -8,7 +8,8 @@ listener::listener(int port, size_t workers_count)
       _io_manager(_workers_count),
       _signals(_io_manager.get_io_service()),
       _acceptor(_io_manager.get_io_service()),
-      _request_handler()
+      _request_handler(),
+      n(0)
 {
     _signals.add(SIGINT);
     _signals.add(SIGTERM);
@@ -31,6 +32,9 @@ listener::listener(int port, size_t workers_count)
 
 listener::~listener()
 {
+    std::cout << "req: " << request::n << std::endl
+              << "resp: " << response::n << std::endl
+              << "connection finished: " << connection::n << std::endl;
     std::cout << "cache hits:";
 }
 
@@ -43,14 +47,25 @@ void listener::run()
 
 void listener::exec_accept()
 {
-    _connection.reset(new connection(_io_manager.get_io_service(), _request_handler));
-    _acceptor.async_accept(_connection->socket(),
-        [this](boost::system::error_code ec) {
-            if (!ec) {
-                _connection->run();
-            }
+//    _connection.reset(new connection(_io_manager.get_io_service(), _request_handler));
+//        _acceptor.async_accept(_connection->socket(),
+//            [this](boost::system::error_code ec) {
+//                if (!ec) {
+//                    _connection->run();
+//                }
 
-            exec_accept();
+//                exec_accept();
+//            }
+//        );
+   auto connect = boost::make_shared<connection>(_io_manager.get_io_service(), _request_handler);
+    _acceptor.async_accept(connect->socket(),
+        [this, connect](boost::system::error_code ec) {
+            if (!ec) {
+//                ++n;
+                connect->run();
+                exec_accept();
+//                std::cout << n << std::endl;
+            }
         }
     );
 }

@@ -5,7 +5,6 @@
 
 #include <ctime>
 #include <sstream>
-#include <thread>
 
 void request_handler::handle(request* req, response* resp)
 {
@@ -28,7 +27,7 @@ void request_handler::handle_internal(request* req, response* resp)
 
     if (!filter_request(req)) {
         auto f = file::make_file();
-        f->load("Method not allowed mothefuckers");
+        f->load("Method not allowed");
         resp->set_status(status_codes::METHOD_NOT_ALLOWED);
         resp->assign_data(f);
         return;

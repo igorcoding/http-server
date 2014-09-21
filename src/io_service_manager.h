@@ -11,6 +11,7 @@
 
 class io_service_manager
 {
+    typedef boost::thread thread_t;
     typedef boost::shared_ptr<boost::thread> thread_ptr;
     typedef boost::shared_ptr<boost::asio::io_service> io_service_ptr;
     typedef boost::shared_ptr<boost::asio::io_service::work> work_ptr;

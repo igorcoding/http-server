@@ -5,6 +5,8 @@
 #include <boost/bind.hpp>
 #include <cstdlib>
 
+std::atomic_int connection::n(0);
+
 connection::connection(boost::asio::io_service& io_service, request_handler& req_handler)
     : _socket(io_service),
       _req(new request),
@@ -38,13 +40,16 @@ void connection::exec_read()
 
 void connection::read_handle(boost::system::error_code e, size_t bytes)
 {
-    if (e) {
+    if (e && bytes == 0) {
+        std::cout << e.message() << std::endl;
+        boost::system::error_code ec;
+        _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
         return;
     }
     bool ready = _req->add_chunk(_buf.data(), bytes);
     if (ready) {
         _request_handler.handle(_req, _resp);
-        boost::asio::async_write(_socket, to_asio_buffers(*_resp),
+        boost::asio::async_write(_socket, to_asio_buffers(*_resp, _req->get_method() != methods::HEAD),
                                  boost::bind(&connection::write_handle, shared_from_this(),
                                              boost::asio::placeholders::error));
     } else {
@@ -55,12 +60,18 @@ void connection::read_handle(boost::system::error_code e, size_t bytes)
 void connection::write_handle(boost::system::error_code e)
 {
     if (!e) {
+        ++n;
         boost::system::error_code ec;
         _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        if (ec) {
+            std::cout << "error closing socket\n";
+        }
+    } else {
+        std::cout << "error while writing to socket: " << e.message() << "\n";
     }
 }
 
-std::vector<boost::asio::const_buffer> connection::to_asio_buffers(response& resp)
+std::vector<boost::asio::const_buffer> connection::to_asio_buffers(response& resp, bool send_data)
 {
     std::vector<boost::asio::const_buffer> bufs;
 
@@ -74,7 +85,7 @@ std::vector<boost::asio::const_buffer> connection::to_asio_buffers(response& res
         bufs.push_back(boost::asio::buffer(misc::crlf_arr));
     }
     bufs.push_back(boost::asio::buffer(misc::crlf_arr));
-    if (resp.get_data() != nullptr) {
+    if (send_data && resp.get_data() != nullptr) {
         bufs.push_back(boost::asio::buffer(resp.get_data(), resp.get_data_size()));
     }
     return bufs;

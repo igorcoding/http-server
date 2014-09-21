@@ -2,6 +2,11 @@
 
 chunk::ptr chunk::merge_chunks(const std::vector<chunk::ptr>& chunks)
 {
+    if (chunks.size() == 1) {
+        chunks[0]->postpone_delete();
+        return chunks[0];
+    }
+
     size_t total_size = 0;
     for (auto& c : chunks) {
         total_size += c->size();

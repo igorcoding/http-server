@@ -13,7 +13,8 @@ public:
 
     chunk(const char* buf, size_t size)
         : _data(nullptr),
-          _size(size)
+          _size(size),
+          _immediate_delete(true)
     {
         _data = new char[_size];
         memcpy(_data, buf, _size);
@@ -34,11 +35,22 @@ public:
         return _size;
     }
 
+    bool is_immediate_delete()
+    {
+        return _immediate_delete;
+    }
+
+    void postpone_delete()
+    {
+        _immediate_delete = false;
+    }
+
     static chunk::ptr merge_chunks(const std::vector<chunk::ptr>& chunks);
 
 private:
     char* _data;
     size_t _size;
+    bool _immediate_delete;
 };
 
 #endif // CHUNK_H

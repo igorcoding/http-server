@@ -3,6 +3,8 @@
 
 #include <sstream>
 
+std::atomic_int response::n(0);
+
 const protocol response::_protocol = { 1, 1 };
 
 response::response()
@@ -29,25 +31,26 @@ void response::add_header(const header& h)
     _headers.push_back(h);
 }
 
-//std::string response::build()
-//{
-//    std::stringstream ss;
-//    ss << _protocol.to_string() << " "
-//       << static_cast<int>(_status_code) << " "
-//       << code_to_str(_status_code) << misc::crlf;
-//    for (auto& h : _headers) {
-//        ss << h.to_string() << misc::crlf;
-//    }
+const std::string& response::build(bool send_data)
+{
+    std::stringstream ss;
+    ss << _protocol.to_string() << " "
+       << static_cast<int>(_status_code) << " "
+       << code_to_str() << misc::crlf;
+    for (auto& h : _headers) {
+        ss << h.to_string() << misc::crlf;
+    }
 
 
-//    ss << misc::crlf;
+    ss << misc::crlf;
 
-//    if (!_data->is_empty()) {
-//        ss << std::string(get_data(), get_data_size());
-//    }
+    if (send_data && !_data->is_empty()) {
+        ss << std::string(get_data(), get_data_size());
+    }
 
-//    return ss.str();
-//}
+    _raw_response = ss.str();
+    return _raw_response;
+}
 
 protocol response::get_protocol() const
 {
@@ -61,6 +64,7 @@ status_codes::status_code response::get_status_code() const
 
 std::string& response::get_status_line()
 {
+    ++n;
     std::stringstream ss;
     ss << _protocol.to_string() << " "
        << static_cast<int>(_status_code) << " "
