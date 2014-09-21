@@ -14,10 +14,10 @@ public:
     file_ptr read(const std::string& src, bool do_reading = true);
 
 private:
-//    bool path_contains_file(boost::filesystem::path dir, boost::filesystem::path file);
+    bool path_contains_file(boost::filesystem::path dir, boost::filesystem::path file);
 
 private:
-    std::string _doc_root;
+    boost::filesystem::path _doc_root;
     std::string _index_filename;
     cache _cache;
 };

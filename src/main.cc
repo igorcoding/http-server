@@ -25,10 +25,10 @@ int main(int argc, char** argv)
 
     if (!vm.count("config")) {
         std::cout << "Using default config." << std::endl;
+    } else {
+        std::cout << "Using config: " << config_location << std::endl;
     }
-
-
-    std::cout << config_location << std::endl;
+    std::cout << std::endl;
 
     try {
         http_server server(config_location);

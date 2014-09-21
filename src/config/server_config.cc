@@ -80,3 +80,14 @@ server_config& server_config::default_config() {
     static server_config default_conf("127.0.0.1", 80, "./", "index.html", 8, 60);
     return default_conf;
 }
+
+std::ostream& operator <<(std::ostream& os, const server_config& config)
+{
+    os << "ip: " << config._ip << std::endl
+       << "port: " << config._port << std::endl
+       << "document root: " << config._doc_root << std::endl
+       << "index filename: " << config._index_filename << std::endl
+       << "workers count: " << config._workers_count << std::endl
+       << "cache period (min): " << config._cache_period << std::endl;
+    return os;
+}

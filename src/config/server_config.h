@@ -16,6 +16,8 @@ public:
     size_t get_workers_count() const;
     double get_cache_period() const;
 
+    friend std::ostream& operator <<(std::ostream& os, const server_config& config);
+
 private:
     server_config();
     server_config(const std::string& ip, int port, const std::string& doc_root, const std::string& index_filename, size_t workers_count, double cache_period);

@@ -8,7 +8,7 @@
 #include <boost/make_shared.hpp>
 
 file_reader::file_reader(const std::string& doc_root, const std::string& index_filename)
-    : _doc_root(doc_root),
+    : _doc_root(boost::filesystem::canonical(boost::filesystem::absolute(doc_root))),
       _index_filename(index_filename),
       _cache(server_config::instance().get_cache_period())
 {
@@ -18,13 +18,10 @@ file_ptr file_reader::read(const std::string& src, bool do_reading)
 {
     using namespace boost::filesystem;
 
-    path doc_root_path(_doc_root);
-    doc_root_path = canonical(absolute(doc_root_path));
 
-
-    path src_path(src);
+    path src_path;
     try {
-        src_path = canonical(absolute(doc_root_path / src_path));
+        src_path = canonical(absolute(_doc_root / path(src)));
     } catch (std::exception& e) {
         throw file_error("File not found");
     }
@@ -32,13 +29,13 @@ file_ptr file_reader::read(const std::string& src, bool do_reading)
     try {
         if (is_directory(src_path)) {
             src_path /= path(_index_filename);
-            src_path = canonical(absolute(src_path));
+            src_path = canonical(src_path);
         }
     } catch (std::exception& e) {
         throw file_access_denied();
     }
 
-//    if (!path_contains_file(doc_root_path, src_path)) {
+//    if (!path_contains_file(_doc_root, src_path)) {
 //        throw file_error("Not found");
 //    }
 
@@ -71,25 +68,26 @@ file_ptr file_reader::read(const std::string& src, bool do_reading)
     }
 }
 
-//bool file_reader::path_contains_file(boost::filesystem::path dir, boost::filesystem::path file)
-//{
-//    // If dir ends with "/" and isn't the root directory, then the final
-//    // component returned by iterators will include "." and will interfere
-//    // with the std::equal check below, so we strip it before proceeding.
-//    if (dir.filename() == ".")
-//    dir.remove_filename();
-//    // We're also not interested in the file's name.
-//    assert(file.has_filename());
-//    file.remove_filename();
+bool file_reader::path_contains_file(boost::filesystem::path dir, boost::filesystem::path file)
+{
+    // If dir ends with "/" and isn't the root directory, then the final
+    // component returned by iterators will include "." and will interfere
+    // with the std::equal check below, so we strip it before proceeding.
+    if (dir.filename() == ".")
+    dir.remove_filename();
+    // We're also not interested in the file's name.
+    if (!file.has_filename())
+        return false;
+    file.remove_filename();
 
-//    // If dir has more components than file, then file can't possibly
-//    // reside in dir.
-//    auto dir_len = std::distance(dir.begin(), dir.end());
-//    auto file_len = std::distance(file.begin(), file.end());
-//    if (dir_len > file_len)
-//        return false;
+    // If dir has more components than file, then file can't possibly
+    // reside in dir.
+    auto dir_len = std::distance(dir.begin(), dir.end());
+    auto file_len = std::distance(file.begin(), file.end());
+    if (dir_len > file_len)
+        return false;
 
-//    // This stops checking when it reaches dir.end(), so it's OK if file
-//    // has more directory components afterward. They won't be checked.
-//    return std::equal(dir.begin(), dir.end(), file.begin());
-//}
+    // This stops checking when it reaches dir.end(), so it's OK if file
+    // has more directory components afterward. They won't be checked.
+    return std::equal(dir.begin(), dir.end(), file.begin());
+}
