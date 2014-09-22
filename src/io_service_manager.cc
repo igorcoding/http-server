@@ -41,8 +41,9 @@ void io_service_manager::stop()
 
 boost::asio::io_service& io_service_manager::get_io_service()
 {
-    auto id = next_io();
-    return *_io_services[id];
+    auto& serv = *_io_services[_current_io];
+    next_io();
+    return serv;
 }
 
 boost::asio::io_service& io_service_manager::get_first_io_service()

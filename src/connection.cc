@@ -51,18 +51,19 @@ void connection::read_handle(boost::system::error_code e, size_t bytes)
         _request_handler.handle(_req, _resp);
         boost::asio::async_write(_socket, to_asio_buffers(*_resp, _req->get_method() != methods::HEAD),
                                  boost::bind(&connection::write_handle, shared_from_this(),
-                                             boost::asio::placeholders::error));
+                                             boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred()));
     } else {
         exec_read();
     }
 }
 
-void connection::write_handle(boost::system::error_code e)
+void connection::write_handle(boost::system::error_code e, size_t bytes)
 {
     if (!e) {
-        ++n;
+//        std::cout << bytes << std::endl;
         boost::system::error_code ec;
         _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        ++n;
         if (ec) {
             std::cout << "error closing socket\n";
         }

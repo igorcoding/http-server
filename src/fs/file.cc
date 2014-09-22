@@ -53,6 +53,7 @@ file::file()
 file::~file()
 {
     delete[] _data;
+    _data = nullptr;
     _size = 0;
     _type = mime_types::text_plain;
 }

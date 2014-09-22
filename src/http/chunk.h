@@ -23,6 +23,7 @@ public:
     ~chunk()
     {
         delete[] _data;
+        _data = nullptr;
     }
 
     const char* data()

@@ -47,16 +47,6 @@ void listener::run()
 
 void listener::exec_accept()
 {
-//    _connection.reset(new connection(_io_manager.get_io_service(), _request_handler));
-//        _acceptor.async_accept(_connection->socket(),
-//            [this](boost::system::error_code ec) {
-//                if (!ec) {
-//                    _connection->run();
-//                }
-
-//                exec_accept();
-//            }
-//        );
    auto connect = boost::make_shared<connection>(_io_manager.get_io_service(), _request_handler);
     _acceptor.async_accept(connect->socket(),
         [this, connect](boost::system::error_code ec) {
@@ -64,7 +54,6 @@ void listener::exec_accept()
 //                ++n;
                 connect->run();
                 exec_accept();
-//                std::cout << n << std::endl;
             }
         }
     );
