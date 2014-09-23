@@ -23,17 +23,21 @@ public:
 
 
 private:
+    void prefork(int workers_count);
     void exec_accept();
     void init_signal_handlers();
 
 private:
     int _port;
     size_t _workers_count;
-    io_service_manager _io_manager;
+    boost::asio::io_service _io_service;
+    boost::asio::io_service::work _work;
     boost::asio::signal_set _signals;
     boost::asio::ip::tcp::acceptor _acceptor;
     connection_ptr _connection;
     request_handler _request_handler;
+
+    std::vector<pid_t> _forks;
 };
 
 #endif // LISTENER_H
