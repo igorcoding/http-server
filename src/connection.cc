@@ -60,7 +60,6 @@ void connection::read_handle(boost::system::error_code e, size_t bytes)
 void connection::write_handle(boost::system::error_code e, size_t bytes)
 {
     if (!e) {
-//        std::cout << bytes << std::endl;
         boost::system::error_code ec;
         _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
         ++n;

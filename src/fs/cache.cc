@@ -1,6 +1,7 @@
 #include "cache.h"
 
 #include <ctime>
+#include <iostream>
 #include <boost/make_shared.hpp>
 
 cache::cache(double cache_period)

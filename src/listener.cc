@@ -51,10 +51,9 @@ void listener::exec_accept()
     _acceptor.async_accept(connect->socket(),
         [this, connect](boost::system::error_code ec) {
             if (!ec) {
-//                ++n;
                 connect->run();
-                exec_accept();
             }
+            exec_accept();
         }
     );
 }
