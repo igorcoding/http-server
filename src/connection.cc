@@ -3,6 +3,7 @@
 #include "http/request_handler.h"
 
 #include <boost/bind.hpp>
+#include <boost/thread.hpp>
 #include <cstdlib>
 
 //std::atomic_int connection::n(0);
@@ -68,6 +69,8 @@ void connection::write_handle(boost::system::error_code e)
     } else {
 //        std::cout << "error while writing to socket: " << e.message() << "\n";
     }
+
+//    boost::this_thread::sleep(boost::posix_time::microseconds(50));b
 }
 
 std::vector<boost::asio::const_buffer> connection::to_asio_buffers(response& resp, bool send_data)

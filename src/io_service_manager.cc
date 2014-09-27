@@ -7,7 +7,7 @@ io_service_manager::io_service_manager(size_t workers_count)
     : _workers_count(workers_count),
       _current_io(0)
 {
-    for (size_t i = 0; i < 1; ++i) {
+    for (size_t i = 0; i < _workers_count; ++i) {
         io_service_ptr io(new boost::asio::io_service);
         work_ptr w(new boost::asio::io_service::work(*io));
         _works.push_back(w);
@@ -19,7 +19,7 @@ void io_service_manager::run()
 {
     for (size_t i = 0; i < _workers_count; ++i) {
         _threads.push_back(boost::make_shared<thread_t>(
-                               boost::bind(&boost::asio::io_service::run, _io_services[0])));
+                               boost::bind(&boost::asio::io_service::run, _io_services[i])));
     }
     std::cout << "Started " << _workers_count << " workers." << std::endl;
 
