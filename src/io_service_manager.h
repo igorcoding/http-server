@@ -22,7 +22,6 @@ public:
     void run();
     void stop();
     boost::asio::io_service& get_io_service();
-    boost::asio::io_service& get_first_io_service();
 
 private:
     size_t next_io();
@@ -32,7 +31,6 @@ private:
     std::vector<io_service_ptr> _io_services;
     std::vector<work_ptr> _works;
     std::vector<thread_ptr> _threads;
-    std::function<size_t()> _rand;
     size_t _current_io;
 };
 

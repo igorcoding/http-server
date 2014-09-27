@@ -28,7 +28,7 @@ public:
     const std::vector<header>& get_headers() const;
     bool is_malformed() const;
 
-    static std::atomic_int n;
+//    static std::atomic_int n;
 
 private:
     static request& make_malformed(request& req);

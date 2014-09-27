@@ -8,8 +8,7 @@ listener::listener(int port, size_t workers_count)
       _io_manager(_workers_count),
       _signals(_io_manager.get_io_service()),
       _acceptor(_io_manager.get_io_service()),
-      _request_handler(),
-      n(0)
+      _request_handler()
 {
     _signals.add(SIGINT);
     _signals.add(SIGTERM);
@@ -32,10 +31,10 @@ listener::listener(int port, size_t workers_count)
 
 listener::~listener()
 {
-    std::cout << "req: " << request::n << std::endl
-              << "resp: " << response::n << std::endl
-              << "connection finished: " << connection::n << std::endl;
-    std::cout << "cache hits:";
+//    std::cout << "req: " << request::n << std::endl
+//              << "resp: " << response::n << std::endl
+//              << "connection finished: " << connection::n << std::endl;
+//    std::cout << "cache hits:";
 }
 
 void listener::run()

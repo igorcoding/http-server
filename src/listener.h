@@ -21,7 +21,6 @@ public:
 
     void run();
 
-    std::atomic_int n;
 
 private:
     void exec_accept();

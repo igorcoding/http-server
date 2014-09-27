@@ -22,12 +22,12 @@ public:
     void run();
     socket_t& socket();
 
-    static std::atomic_int n;
+//    static std::atomic_int n;
 
 private:
     void exec_read();
     void read_handle(boost::system::error_code e, size_t bytes);
-    void write_handle(boost::system::error_code e, size_t bytes);
+    void write_handle(boost::system::error_code e);
     std::vector<boost::asio::const_buffer> to_asio_buffers(response& resp, bool send_data);
 
 private:

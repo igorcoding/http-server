@@ -56,7 +56,7 @@ public:
 
     std::string code_to_str() const;
 
-    static std::atomic_int n;
+//    static std::atomic_int n;
 
 private:
     static const protocol _protocol;

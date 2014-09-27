@@ -5,7 +5,7 @@
 #include <boost/bind.hpp>
 #include <cstdlib>
 
-std::atomic_int connection::n(0);
+//std::atomic_int connection::n(0);
 
 connection::connection(boost::asio::io_service& io_service, request_handler& req_handler)
     : _socket(io_service),
@@ -41,7 +41,7 @@ void connection::exec_read()
 void connection::read_handle(boost::system::error_code e, size_t bytes)
 {
     if (e && bytes == 0) {
-        std::cout << e.message() << std::endl;
+//        std::cout << e.message() << std::endl;
         boost::system::error_code ec;
         _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
         return;
@@ -51,23 +51,22 @@ void connection::read_handle(boost::system::error_code e, size_t bytes)
         _request_handler.handle(_req, _resp);
         boost::asio::async_write(_socket, to_asio_buffers(*_resp, _req->get_method() != methods::HEAD),
                                  boost::bind(&connection::write_handle, shared_from_this(),
-                                             boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred()));
+                                             boost::asio::placeholders::error));
     } else {
         exec_read();
     }
 }
 
-void connection::write_handle(boost::system::error_code e, size_t bytes)
+void connection::write_handle(boost::system::error_code e)
 {
     if (!e) {
         boost::system::error_code ec;
         _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-        ++n;
         if (ec) {
             std::cout << "error closing socket\n";
         }
     } else {
-        std::cout << "error while writing to socket: " << e.message() << "\n";
+//        std::cout << "error while writing to socket: " << e.message() << "\n";
     }
 }
 

@@ -2,7 +2,7 @@
 #include "../util/misc.h"
 #include "exceptions/malformed_components.h"
 
-std::atomic_int request::n(0);
+//std::atomic_int request::n(0);
 
 request::request()
     : _malformed(false)
@@ -17,7 +17,6 @@ request::~request()
 
 void request::parse(const std::string& raw_request)
 {
-    ++n;
     std::vector<std::string> lines;
     std::string splitter(misc::crlf);
     misc::split(raw_request, splitter, lines);

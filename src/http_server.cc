@@ -25,13 +25,13 @@ http_server::~http_server()
 
 void http_server::run()
 {
-    std::cout << "Starting server..." << std::endl;
+    std::cout << "=== Starting server... ===" << std::endl;
     auto conf = server_config::instance();
     std::cout << "Config: " << std::endl
               << conf << std::endl;
     _listener = new listener(conf.get_port(), conf.get_workers_count());
     _listener->run();
-    std::cout << "Server stopped" << std::endl;
+    std::cout << "=== Server stopped ===" << std::endl;
 }
 
 void http_server::stop()

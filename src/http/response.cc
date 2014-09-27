@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-std::atomic_int response::n(0);
+//std::atomic_int response::n(0);
 
 const protocol response::_protocol = { 1, 1 };
 
@@ -64,7 +64,6 @@ status_codes::status_code response::get_status_code() const
 
 std::string& response::get_status_line()
 {
-    ++n;
     std::stringstream ss;
     ss << _protocol.to_string() << " "
        << static_cast<int>(_status_code) << " "
@@ -102,7 +101,7 @@ std::string response::code_to_str() const
     case BAD_REQUEST:
         return "Bad Request";
     case FORBIDDEN:
-        return "Access Denied";
+        return "Forbidden";
     case NOT_FOUND:
         return "Not Found";
     case METHOD_NOT_ALLOWED:

@@ -5,6 +5,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/thread/lock_guard.hpp>
 
@@ -36,12 +37,13 @@ file::ptr file_reader::read(const std::string& src, bool do_reading)
         throw file_access_denied();
     }
 
-//    if (!path_contains_file(_doc_root, src_path)) {
-//        throw file_error("Not found");
-//    }
+    auto s_path = src_path.generic_string();
+
+    if (!boost::starts_with(s_path, _doc_root.generic_string())) {
+        throw file_error("Not found");
+    }
 
     boost::lock_guard<boost::mutex> lk(_m);
-    auto s_path = src_path.generic_string();
     auto res = _cache.get(s_path);
     if (res != nullptr) {
         return res;
