@@ -10,8 +10,7 @@ listener::listener(int port, size_t workers_count)
       _signals(_io_service),
       _acceptor(_io_service),
       _request_handler(),
-      _forks(),
-      n(0)
+      _forks()
 {
     init_signal_handlers();
 
