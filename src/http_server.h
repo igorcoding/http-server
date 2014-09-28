@@ -4,7 +4,6 @@
 #include "listener.h"
 
 #include <string>
-#include <boost/asio.hpp>
 
 class http_server
 {
