@@ -63,10 +63,10 @@ file::ptr file_reader::read(const std::string& src, bool do_reading)
             fs.close();
 
             auto out = file::make_file();
-            out->load(data, size, file::guess_mime(src_path.extension().generic_string()), false, _cache.count_expires());
+            out->load(data, size, file::guess_mime(src_path.extension().generic_string()), true, _cache.count_expires());
 
-            if (do_reading)
-                _cache.add(s_path, out);
+//            if (do_reading)
+//                _cache.add(s_path, out);
             return out;
         } else {
             throw file_error("File not found");

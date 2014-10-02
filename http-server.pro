@@ -27,7 +27,8 @@ SOURCES += \
     src/fs/file_access_denied.cc \
     src/http/chunk.cc \
     src/fs/cache.cc \
-    src/listener.cc
+    src/listener.cc \
+    src/connection.cc
 
 HEADERS += \
     src/http_server.h \
@@ -53,11 +54,13 @@ HEADERS += \
     src/fs/file_access_denied.h \
     src/http/chunk.h \
     src/fs/cache.h \
-    src/listener.h
+    src/listener.h \
+    src/connection.h
 
 
 unix {
-    LIBS += -lboost_system \
+    LIBS += -lev \
+            -lboost_system \
             -lboost_filesystem \
             -lboost_thread \
             -lboost_program_options

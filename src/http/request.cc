@@ -5,7 +5,8 @@
 //std::atomic_int request::n(0);
 
 request::request()
-    : _malformed(false)
+    : _malformed(false),
+      _ready(false)
 { }
 
 request::~request()
@@ -41,6 +42,7 @@ void request::parse(const std::string& raw_request)
             auto& line = *it;
             _headers.push_back(header::parse(line));
         }
+        _ready = true;
 
     } catch (malformed_request& e) {
         make_malformed(*this);
@@ -124,5 +126,9 @@ request& request::make_malformed(request& req)
 
 bool request::is_malformed() const {
     return _malformed;
+}
+
+bool request::is_ready() const {
+    return _ready;
 }
 

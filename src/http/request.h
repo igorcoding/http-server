@@ -27,6 +27,7 @@ public:
     const protocol& get_protocol() const;
     const std::vector<header>& get_headers() const;
     bool is_malformed() const;
+    bool is_ready() const;
 
 //    static std::atomic_int n;
 
@@ -42,6 +43,7 @@ private:
     protocol _protocol;
     std::vector<header> _headers;
     bool _malformed;
+    bool _ready;
     /// TODO: request body, do we really need it?
 
     std::vector<chunk::ptr> _chunks;
