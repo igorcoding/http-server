@@ -102,7 +102,7 @@ void listener::accept_cb(ev::io& w, int revents)
     }
 
     auto conn = new connection(client_fd);
-    _io.start();
+//    _io.start();
 
 //    const int size = 8192;
 //    char buffer[size];

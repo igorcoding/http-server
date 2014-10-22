@@ -59,9 +59,9 @@ void connection::write_cb(ev::io& w)
     char msg[] = "HTTP/1.1 200 OK\r\n\r\nHello from server!";
     size_t s = strlen(msg);
 
-    ssize_t written = write(w.fd, msg, s);
+    ssize_t written = ::send(w.fd, msg, s, 0);
     if (written < 0) {
-        perror("read error");
+        perror("write error");
         return;
     }
 
@@ -80,7 +80,7 @@ void connection::write_cb(ev::io& w)
 void connection::read_cb(ev::io& w) {
     std::cout << "read_cb" << std::endl;
 
-    char buffer[1024];
+    char buffer[4096];
 
     ssize_t nread = ::recv(w.fd, buffer, sizeof(buffer), 0);
 
