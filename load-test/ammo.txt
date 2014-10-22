@@ -1,0 +1,7 @@
+146
+GET /httptest/wikipedia_russia.html HTTP/1.1
+User-Agent: YandexTank/1.1.1
+Host: localhost
+Accept-Encoding: gzip, deflate
+Connection: Close
+
